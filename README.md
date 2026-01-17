@@ -150,4 +150,4 @@ Original Figma design: https://www.figma.com/design/gbWYTNkQQqiH01IaGpXHSd/Desig
 
 ---
 
-**Built with discipline. 🗿**
+**Built with discipline. 🗿**# SigmaLog_Aplha
