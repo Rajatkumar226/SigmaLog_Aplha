@@ -1,0 +1,275 @@
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.88) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45%       { transform: translateY(-8px) scale(1.04); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.08); }
+}
+
+@keyframes slideEnterRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideExitLeft {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-28px); }
+}
+
+@keyframes progressGrow {
+  from { width: 0; }
+}
+
+@keyframes dotExpand {
+  from { transform: scaleX(0.4); opacity: 0.4; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.onboarding-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(145deg, #0f1628 0%, #0a0e1a 100%);
+  border-radius: 24px;
+  overflow: hidden;
+  animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  // Dynamic glow border — JS sets --accent-color custom property
+  border: 1px solid var(--accent-border, rgba(255,255,255,0.1));
+  box-shadow:
+    0 0 0 1px var(--accent-border, rgba(255,255,255,0.05)),
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 80px var(--accent-glow, rgba(59,130,246,0.06));
+
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+
+  &__glow-stripe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-gradient, linear-gradient(90deg, #3b82f6, #8b5cf6));
+    border-radius: 24px 24px 0 0;
+    transition: background 0.4s ease;
+    animation: glowPulse 2.5s ease-in-out infinite;
+  }
+
+  &__inner {
+    padding: 36px 32px 28px;
+  }
+
+  &__skip {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 12px;
+    color: #4b5563;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.15s;
+
+    &:hover {
+      color: #9ca3af;
+    }
+  }
+
+  // ── Icon area ──────────────────────────────────
+  &__icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    border-radius: 22px;
+    background: var(--accent-bg, rgba(59,130,246,0.08));
+    border: 1px solid var(--accent-border, rgba(59,130,246,0.2));
+    animation: iconFloat 3.5s ease-in-out infinite;
+    transition: background 0.4s ease, border-color 0.4s ease;
+  }
+
+  &__icon-orb {
+    position: absolute;
+    inset: -16px;
+    border-radius: 50%;
+    background: var(--accent-glow, rgba(59,130,246,0.06));
+    animation: glowPulse 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  &__icon {
+    position: relative;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    color: var(--accent-color, #60a5fa);
+    transition: color 0.4s ease;
+  }
+
+  // ── Text content ──────────────────────────────────
+  &__content {
+    text-align: center;
+  }
+
+  &__counter {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--accent-color, #60a5fa);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    transition: color 0.4s ease;
+  }
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f3f4f6;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  &__desc {
+    font-size: 14px;
+    color: #9ca3af;
+    line-height: 1.65;
+    margin: 0 0 16px;
+  }
+
+  &__tip {
+    background: var(--accent-bg, rgba(59,130,246,0.06));
+    border: 1px solid var(--accent-border, rgba(59,130,246,0.15));
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #d1d5db;
+    line-height: 1.55;
+    text-align: left;
+    transition: background 0.4s ease, border-color 0.4s ease;
+  }
+
+  // ── Progress ──────────────────────────────────────
+  &__progress-track {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 99px;
+    margin: 24px 0 20px;
+    overflow: hidden;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    background: var(--accent-gradient, linear-gradient(90deg, #3b82f6, #8b5cf6));
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
+    animation: progressGrow 0.4s ease both;
+  }
+
+  // ── Dots ──────────────────────────────────────────
+  &__dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  &__dot {
+    height: 6px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    cursor: pointer;
+    transition: background 0.25s ease, width 0.25s ease;
+    width: 8px;
+
+    &--active {
+      background: var(--accent-color, #60a5fa);
+      width: 24px;
+      animation: dotExpand 0.25s ease both;
+    }
+  }
+
+  // ── Buttons ───────────────────────────────────────
+  &__actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__btn-back {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 11px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #f3f4f6;
+    }
+
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  &__btn-next {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent-gradient, linear-gradient(135deg, #3b82f6, #8b5cf6));
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.18s, transform 0.15s;
+    box-shadow: 0 4px 20px var(--accent-glow, rgba(59,130,246,0.25));
+
+    &:hover { opacity: 0.92; transform: translateY(-1px); }
+    &:active { transform: translateY(0); }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

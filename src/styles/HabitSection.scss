@@ -1,0 +1,459 @@
+@keyframes rowSlideIn {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes excusePanelOpen {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes checkPop {
+  0%   { transform: scale(0) rotate(-8deg); }
+  70%  { transform: scale(1.2) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes capsuleGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.07); }
+  50%       { box-shadow: 0 0 42px rgba(245, 158, 11, 0.2); }
+}
+
+@keyframes envelopeWobble {
+  0%, 80%, 100% { transform: rotate(0deg); }
+  85%            { transform: rotate(-9deg); }
+  92%            { transform: rotate(9deg); }
+  96%            { transform: rotate(-4deg); }
+}
+
+@keyframes progressFill {
+  from { width: 0; }
+}
+
+// ── Today's Discipline Card ──────────────────────────────────
+.habit-section {
+  padding: 26px 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+
+  &--perfect {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-color: rgba(16, 185, 129, 0.22);
+    box-shadow: 0 0 48px rgba(16, 185, 129, 0.06);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e5e7eb;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  &__score {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    &-val {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    &-unit {
+      font-size: 11px;
+      color: #374151;
+    }
+  }
+
+  &__empty {
+    padding: 32px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #374151;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+// ── Individual Habit Row ─────────────────────────────────────
+.habit-row {
+  position: relative;
+
+  &__main {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    transition: background 0.18s, border-color 0.18s;
+    animation: rowSlideIn 0.28s ease both;
+
+    &:hover { background: rgba(255, 255, 255, 0.025); }
+
+    &--completed {
+      background: rgba(16, 185, 129, 0.05);
+      border-color: rgba(16, 185, 129, 0.12);
+    }
+
+    &--excusing {
+      background: rgba(245, 158, 11, 0.04);
+      border-color: rgba(245, 158, 11, 0.12);
+    }
+  }
+
+  &__shortcut {
+    position: absolute;
+    left: -22px;
+    font-size: 10px;
+    color: #1f2937;
+    opacity: 0;
+    user-select: none;
+    transition: opacity 0.15s;
+    pointer-events: none;
+
+    .habit-row__main:hover + & { opacity: 1; }
+  }
+
+  &__checkbox {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+
+    &--checked {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+
+      svg {
+        animation: checkPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+    }
+
+    svg { width: 11px; height: 11px; display: block; }
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 14px;
+    color: #e5e7eb;
+    transition: color 0.2s;
+
+    &--done {
+      color: #374151;
+      text-decoration: line-through;
+      text-decoration-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  &__category {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1px solid;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+
+    // Category color variants
+    &--Body      { background: rgba(59, 130, 246, 0.1);  color: #60a5fa; border-color: rgba(59, 130, 246, 0.22); }
+    &--Mind      { background: rgba(168, 85, 247, 0.1);  color: #c084fc; border-color: rgba(168, 85, 247, 0.22); }
+    &--Career    { background: rgba(245, 158, 11, 0.1);  color: #fbbf24; border-color: rgba(245, 158, 11, 0.22); }
+    &--Discipline{ background: rgba(16, 185, 129, 0.1);  color: #34d399; border-color: rgba(16, 185, 129, 0.22); }
+    &--default   { background: rgba(255, 255, 255, 0.06); color: #9ca3af; border-color: rgba(255, 255, 255, 0.14); }
+  }
+
+  &__points {
+    font-size: 12px;
+    color: #374151;
+    width: 26px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  // Excuse trigger (hover-only)
+  &__excuse-trigger {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    opacity: 0;
+    flex-shrink: 0;
+    transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+
+    .habit-row__main:hover & { opacity: 1; }
+
+    &:hover {
+      color: #6b7280;
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+  }
+
+  // Excused badge (already logged)
+  &__excused-badge {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.26);
+    background: rgba(245, 158, 11, 0.06);
+    color: #d97706;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.06);
+      border-color: rgba(239, 68, 68, 0.26);
+      color: #f87171;
+    }
+  }
+
+  &__excuse-cancel-x {
+    font-size: 12px;
+    color: #374151;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    line-height: 1;
+
+    &:hover { color: #6b7280; }
+  }
+
+  // Excuse input panel
+  &__excuse-panel {
+    overflow: hidden;
+  }
+
+  &__excuse-inner {
+    padding: 10px 14px 14px 43px;
+    animation: excusePanelOpen 0.22s ease;
+  }
+
+  &__excuse-textarea {
+    width: 100%;
+    background: rgba(245, 158, 11, 0.03);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #d1d5db;
+    outline: none;
+    resize: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &::placeholder { color: #374151; }
+
+    &:focus {
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.05);
+    }
+  }
+
+  &__excuse-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  &__excuse-submit {
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+
+    &:hover:not(:disabled) {
+      background: rgba(245, 158, 11, 0.2);
+    }
+
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+
+  &__excuse-cancel-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: #374151;
+
+    &:hover { color: #6b7280; border-color: rgba(255, 255, 255, 0.12); }
+  }
+
+  &__excuse-hint {
+    font-size: 11px;
+    color: #1f2937;
+    margin-left: auto;
+  }
+}
+
+// ── Time Capsule Card ─────────────────────────────────────────
+.capsule-card {
+  border-radius: 18px;
+  padding: 24px;
+  transition: all 0.3s;
+
+  &--none {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  &--pending {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  &--ready {
+    background: linear-gradient(145deg, rgba(245, 158, 11, 0.09) 0%, rgba(245, 158, 11, 0.03) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    cursor: pointer;
+    animation: capsuleGlow 2.6s ease-in-out infinite;
+
+    &:hover {
+      background: linear-gradient(145deg, rgba(245, 158, 11, 0.14) 0%, rgba(245, 158, 11, 0.05) 100%);
+    }
+  }
+
+  &__label-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+  }
+
+  &__icon {
+    font-size: 20px;
+    display: inline-block;
+  }
+
+  &__icon--wobble {
+    font-size: 20px;
+    display: inline-block;
+    animation: envelopeWobble 3s ease-in-out infinite;
+  }
+
+  &__label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    &--ready { color: #f59e0b; }
+    &--muted { color: #374151; }
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e5e7eb;
+    margin: 0 0 5px;
+  }
+
+  &__desc {
+    font-size: 12px;
+    color: #374151;
+    margin: 0 0 20px;
+    line-height: 1.5;
+
+    .highlight { color: #9ca3af; }
+  }
+
+  &__progress-track {
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(to right, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0.75));
+    animation: progressFill 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.2s;
+  }
+
+  &__progress-label {
+    font-size: 11px;
+    color: #1f2937;
+    text-align: right;
+  }
+
+  &__open-btn {
+    width: 100%;
+    padding: 11px 0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.42);
+    color: #fbbf24;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(245, 158, 11, 0.22);
+      box-shadow: 0 0 28px rgba(245, 158, 11, 0.15);
+    }
+  }
+
+  &__write-btn {
+    width: 100%;
+    padding: 11px 0;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.22s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #9ca3af;
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+  }
+}
