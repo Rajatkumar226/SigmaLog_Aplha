@@ -433,33 +433,34 @@ export function SettingsScreen({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
-          className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6"
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <Download className="w-5 h-5" />
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-white/5">
+              <Download className="w-4 h-4 text-gray-400" />
+            </div>
             <h3>Install App</h3>
           </div>
 
           {isInstalled ? (
-            <div className="flex items-center gap-3 text-green-400">
-              <Check className="w-5 h-5" />
-              <span className="text-sm">
-                SigmaLog is installed on your device
-              </span>
+            <div className="flex items-center gap-2 text-green-400 mt-4">
+              <Check className="w-4 h-4" />
+              <span className="text-sm">SigmaLog is installed on your device</span>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-400 mb-4">
-                Add SigmaLog to your home screen for quick access and a native
-                app experience.
+              <p className="text-sm text-gray-500 mb-5">
+                Add to your home screen for quick access and a native app experience.
               </p>
 
               <button
                 onClick={handleInstallClick}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/15 border border-white/20 rounded-lg transition-all cursor-pointer mb-4"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3
+                  bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl
+                  transition-all cursor-pointer text-sm font-medium mb-4"
               >
-                <Download className="w-5 h-5" />
-                <span>Install SigmaLog</span>
+                <Download className="w-4 h-4" />
+                Install SigmaLog
               </button>
 
               <AnimatePresence>
@@ -470,43 +471,33 @@ export function SettingsScreen({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="space-y-3 pt-3 border-t border-white/10">
-                      <p className="text-xs text-gray-400 mb-3">
-                        Use your browser menu to install:
-                      </p>
+                    <div className="space-y-3 pt-4 border-t border-white/10">
+                      <p className="text-xs text-gray-500 mb-3">Use your browser menu to install:</p>
                       <div className="flex items-start gap-3">
-                        <div className="bg-blue-500/10 p-2 rounded">
+                        <div className="bg-blue-500/10 p-2 rounded-lg">
                           <Smartphone className="w-4 h-4 text-blue-400" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs font-medium mb-1">iOS Safari</p>
-                          <p className="text-xs text-gray-400">
-                            Tap Share → Add to Home Screen
-                          </p>
+                          <p className="text-xs font-medium mb-0.5">iOS Safari</p>
+                          <p className="text-xs text-gray-500">Tap Share → Add to Home Screen</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="bg-green-500/10 p-2 rounded">
+                        <div className="bg-green-500/10 p-2 rounded-lg">
                           <Smartphone className="w-4 h-4 text-green-400" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs font-medium mb-1">
-                            Android Chrome
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            Menu (⋮) → Add to Home screen
-                          </p>
+                          <p className="text-xs font-medium mb-0.5">Android Chrome</p>
+                          <p className="text-xs text-gray-500">Menu (⋮) → Add to Home screen</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="bg-purple-500/10 p-2 rounded">
+                        <div className="bg-purple-500/10 p-2 rounded-lg">
                           <Monitor className="w-4 h-4 text-purple-400" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs font-medium mb-1">Desktop</p>
-                          <p className="text-xs text-gray-400">
-                            Look for install icon in address bar
-                          </p>
+                          <p className="text-xs font-medium mb-0.5">Desktop</p>
+                          <p className="text-xs text-gray-500">Look for install icon in address bar</p>
                         </div>
                       </div>
                     </div>
@@ -537,7 +528,7 @@ export function SettingsScreen({
             href="mailto:rajat8615226@gmail.com?subject=SigmaLog Feedback"
             className="flex items-center justify-center gap-2 w-full px-4 py-3
               bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl
-              transition-all text-sm font-medium"
+              transition-all text-sm font-medium cursor-pointer"
           >
             <MessageSquare className="w-4 h-4" />
             Send Feedback
