@@ -333,49 +333,60 @@ export function SettingsScreen({
           transition={{ delay: 0.05 }}
           className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6"
         >
-          <div className="flex items-center gap-3 mb-5">
-            {notificationsEnabled && permissionStatus === 'granted'
-              ? <Bell className="w-5 h-5 text-green-400" />
-              : <BellOff className="w-5 h-5 text-gray-500" />
-            }
-            <h3>Notifications</h3>
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className={`p-2 rounded-xl ${notificationsEnabled && permissionStatus === 'granted' ? 'bg-green-500/15' : 'bg-white/5'}`}>
+              {notificationsEnabled && permissionStatus === 'granted'
+                ? <Bell className="w-4 h-4 text-green-400" />
+                : <BellOff className="w-4 h-4 text-gray-500" />
+              }
+            </div>
+            <div>
+              <h3 className="leading-none">Notifications</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                {notificationsEnabled && permissionStatus === 'granted' ? 'Active' : 'Off'}
+              </p>
+            </div>
           </div>
 
           {/* Unsupported */}
           {permissionStatus === 'unsupported' && (
-            <p className="text-xs text-gray-500 bg-white/5 rounded-xl px-4 py-3">
-              Your browser doesn't support notifications. Try installing the app on Android Chrome.
+            <p className="text-xs text-gray-500 bg-white/5 rounded-xl px-4 py-3 leading-relaxed">
+              Not supported in this browser. Install the app on Android Chrome for push notifications.
             </p>
           )}
 
           {/* Denied */}
           {permissionStatus === 'denied' && (
-            <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
+            <div className="flex items-start gap-3 bg-red-500/8 border border-red-500/15 rounded-2xl px-4 py-4 mb-5">
               <BellOff className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-red-300 leading-relaxed">
-                Notifications are blocked. Open your browser settings → Site permissions → Notifications and allow sigmalog.vercel.app.
-              </p>
+              <div>
+                <p className="text-xs font-medium text-red-300 mb-1">Notifications blocked</p>
+                <p className="text-xs text-red-400/70 leading-relaxed">
+                  Go to browser Settings → Site permissions → Notifications → allow this site.
+                </p>
+              </div>
             </div>
           )}
 
           {permissionStatus !== 'unsupported' && (
             <>
               {/* Enable Toggle */}
-              <div className="flex items-center justify-between mb-5 pb-5 border-b border-white/10">
+              <div className="flex items-center justify-between py-4 px-4 bg-white/3 rounded-2xl mb-4">
                 <div>
-                  <p className="text-sm font-medium mb-1">Daily Reminders</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm font-medium">Daily Reminder</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
                     {notificationsEnabled && permissionStatus === 'granted'
-                      ? `Reminds you at ${reminderTime} if you haven't logged.`
-                      : "Tap to enable. Browser will ask for permission."}
+                      ? `Fires at ${reminderTime} if not logged`
+                      : "Tap to enable"}
                   </p>
                 </div>
                 <button
                   onClick={() => handleNotificationToggle(!notificationsEnabled)}
                   disabled={requestingPermission || permissionStatus === 'denied'}
-                  className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
                     notificationsEnabled && permissionStatus === 'granted'
-                      ? "bg-green-500/40"
+                      ? "bg-green-500/50"
                       : "bg-white/10"
                   }`}
                 >
@@ -404,19 +415,18 @@ export function SettingsScreen({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <label className="block text-xs text-gray-400 uppercase tracking-widest mb-3">
-                      Reminder Time
-                    </label>
-                    <input
-                      type="time"
-                      value={reminderTime}
-                      onChange={(e) => handleReminderTimeChange(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl
-                        outline-none focus:border-green-500/40 transition-colors text-sm"
-                    />
-                    <p className="text-xs text-gray-600 mt-2">
-                      Notification fires if you haven't logged by this time. Works when your browser or PWA is running.
-                    </p>
+                    <div className="px-4 py-4 bg-white/3 rounded-2xl">
+                      <label className="block text-xs text-gray-400 uppercase tracking-widest mb-3">
+                        Remind me at
+                      </label>
+                      <input
+                        type="time"
+                        value={reminderTime}
+                        onChange={(e) => handleReminderTimeChange(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl
+                          outline-none focus:border-green-500/30 transition-colors text-sm"
+                      />
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
