@@ -7,14 +7,12 @@ import {
   Bell,
   BellOff,
   MessageSquare,
-  Shield,
   Smartphone,
   Monitor,
   Download,
   Check,
 } from "lucide-react";
 import { Header } from "./Header";
-import { DataIntegrityIndicator } from "./DataIntegrityIndicator";
 import type { Habit } from "../App";
 import { STANDARD_CATEGORIES } from "../App";
 import {
@@ -519,32 +517,31 @@ export function SettingsScreen({
           )}
         </motion.div>
 
-        {/* Data Integrity & Feedback */}
+        {/* Feedback */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6"
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <Shield className="w-5 h-5" />
-            <h3>Data Integrity</h3>
-          </div>
-
-          <div className="space-y-4">
-            <DataIntegrityIndicator variant="inline" />
-
-            <div className="pt-4 border-t border-white/10">
-              <a
-                href="mailto:rajat8615226@gmail.com?subject=Alpha Feedback"
-                className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 
-                  border border-white/10 rounded-lg transition-all"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Share feedback</span>
-              </a>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-white/5">
+              <MessageSquare className="w-4 h-4 text-gray-400" />
             </div>
+            <h3>Feedback</h3>
           </div>
+          <p className="text-sm text-gray-500 mb-5">
+            Found a bug or have a suggestion? This is an alpha — your input shapes the product.
+          </p>
+          <a
+            href="mailto:rajat8615226@gmail.com?subject=SigmaLog Feedback"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3
+              bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl
+              transition-all text-sm font-medium"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Send Feedback
+          </a>
         </motion.div>
 
         {/* Danger Zone */}
