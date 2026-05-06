@@ -118,10 +118,17 @@ function drawProgressBar(ctx: CanvasRenderingContext2D, y: number, fill: number)
 }
 
 function drawFooter(ctx: CanvasRenderingContext2D) {
-  ctx.font = `400 26px ${FONT}`;
+  // Marketing line 1
+  ctx.font = `500 26px ${FONT}`;
+  ctx.fillStyle = '#334155';
+  ctx.textAlign = 'center';
+  ctx.fillText('Install SigmaLog → sigmalog.vercel.app', S / 2, S - 72);
+
+  // Marketing line 2
+  ctx.font = `400 24px ${FONT}`;
   ctx.fillStyle = '#1e293b';
   ctx.textAlign = 'center';
-  ctx.fillText('sigmalog.vercel.app  ·  discipline in progress', S / 2, S - 48);
+  ctx.fillText('Discipline creates freedom.', S / 2, S - 38);
 }
 
 // ── Daily card ────────────────────────────────────────────────────────────────
