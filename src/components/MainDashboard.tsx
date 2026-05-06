@@ -6,7 +6,7 @@ import { WeeklyOverview } from './WeeklyOverview';
 import { MonthlyHeatmap } from './MonthlyHeatmap';
 import { EmptyStatePrompt } from './EmptyStatePrompt';
 import { KeyboardShortcuts } from './KeyboardShortcuts';
-import { ShareModal } from './ShareModal';
+import { ShareProgressModal } from './ShareProgressModal';
 import * as excuseService from '../services/excuseService';
 import { toast } from 'sonner';
 import type { Habit, DailyLog } from '../App';
@@ -457,7 +457,11 @@ export function MainDashboard({
       </div>
 
       {showShareModal && (
-        <ShareModal onClose={() => setShowShareModal(false)} dailyLogs={dailyLogs} />
+        <ShareProgressModal
+          streak={streak}
+          dailyLogs={dailyLogs}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
     </div>
   );
