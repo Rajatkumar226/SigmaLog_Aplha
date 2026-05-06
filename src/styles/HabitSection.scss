@@ -71,7 +71,7 @@
 
     &-unit {
       font-size: 11px;
-      color: #374151;
+      color: #6b7280;
     }
   }
 
@@ -79,7 +79,7 @@
     padding: 32px 0;
     text-align: center;
     font-size: 14px;
-    color: #374151;
+    color: #6b7280;
   }
 
   &__list {
@@ -120,7 +120,7 @@
     position: absolute;
     left: -22px;
     font-size: 10px;
-    color: #1f2937;
+    color: #6b7280;
     opacity: 0;
     user-select: none;
     transition: opacity 0.15s;
@@ -163,7 +163,7 @@
     transition: color 0.2s;
 
     &--done {
-      color: #374151;
+      color: #6b7280;
       text-decoration: line-through;
       text-decoration-color: rgba(255, 255, 255, 0.15);
     }
@@ -188,7 +188,7 @@
 
   &__points {
     font-size: 12px;
-    color: #374151;
+    color: #6b7280;
     width: 26px;
     text-align: right;
     flex-shrink: 0;
@@ -201,7 +201,7 @@
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.07);
     background: transparent;
-    color: #374151;
+    color: #6b7280;
     cursor: pointer;
     opacity: 0;
     flex-shrink: 0;
@@ -237,7 +237,7 @@
 
   &__excuse-cancel-x {
     font-size: 12px;
-    color: #374151;
+    color: #6b7280;
     cursor: pointer;
     background: none;
     border: none;
@@ -273,7 +273,7 @@
     box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
 
-    &::placeholder { color: #374151; }
+    &::placeholder { color: #6b7280; }
 
     &:focus {
       border-color: rgba(245, 158, 11, 0.4);
@@ -314,14 +314,14 @@
     transition: all 0.2s;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.07);
-    color: #374151;
+    color: #6b7280;
 
     &:hover { color: #6b7280; border-color: rgba(255, 255, 255, 0.12); }
   }
 
   &__excuse-hint {
     font-size: 11px;
-    color: #1f2937;
+    color: #6b7280;
     margin-left: auto;
   }
 }
@@ -378,7 +378,7 @@
     text-transform: uppercase;
 
     &--ready { color: #f59e0b; }
-    &--muted { color: #374151; }
+    &--muted { color: #6b7280; }
   }
 
   &__title {
@@ -390,7 +390,7 @@
 
   &__desc {
     font-size: 12px;
-    color: #374151;
+    color: #6b7280;
     margin: 0 0 20px;
     line-height: 1.5;
 
@@ -415,7 +415,7 @@
 
   &__progress-label {
     font-size: 11px;
-    color: #1f2937;
+    color: #6b7280;
     text-align: right;
   }
 
@@ -446,7 +446,7 @@
     font-weight: 500;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.09);
-    color: #374151;
+    color: #6b7280;
     cursor: pointer;
     transition: all 0.22s;
 

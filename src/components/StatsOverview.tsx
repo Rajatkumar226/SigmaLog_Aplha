@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { TrendingUp, Target, Flame, Calendar, HelpCircle } from 'lucide-react';
 import type { DailyLog } from '../App';
@@ -10,6 +11,8 @@ interface StatsOverviewProps {
   streak: number;
 }
 
+const TOOLTIP_WIDTH = 180;
+
 function StatTooltip({
   content,
   children,
@@ -20,52 +23,82 @@ function StatTooltip({
   alignRight?: boolean;
 }) {
   const [visible, setVisible] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  const calcPos = () => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const rawLeft = alignRight ? rect.right - TOOLTIP_WIDTH : rect.left;
+    const left = Math.max(8, Math.min(rawLeft, window.innerWidth - TOOLTIP_WIDTH - 8));
+    setPos({ top: rect.bottom + 8, left });
+  };
+
+  const show = () => { calcPos(); setVisible(true); };
+  const hide = () => setVisible(false);
 
   return (
-    <div className="relative">
-      <div
-        onMouseEnter={() => setVisible(true)}
-        onMouseLeave={() => setVisible(false)}
-        onClick={() => setVisible(v => !v)}
-      >
-        {children}
+    <>
+      <div ref={triggerRef}>
+        <div
+          onMouseEnter={show}
+          onMouseLeave={hide}
+          onClick={() => { if (!visible) calcPos(); setVisible(v => !v); }}
+        >
+          {children}
+        </div>
       </div>
 
-      <AnimatePresence>
-        {visible && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.93, y: 4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.93, y: 4 }}
-            transition={{ duration: 0.14, ease: 'easeOut' }}
-            className={`absolute pointer-events-none w-44
-              ${alignRight ? 'right-0' : 'left-0'}`}
-            style={{
-              bottom: 'calc(100% + 10px)',
-              background: 'linear-gradient(145deg, #1a2035, #111827)',
-              border: '1px solid rgba(255,255,255,0.14)',
-              borderRadius: '14px',
-              padding: '10px 13px',
-              zIndex: 9999,
-              boxShadow: '0 16px 40px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5)',
-            }}
-          >
-            {/* Downward caret arrow at bottom of tooltip */}
-            <div
-              className={`absolute w-[10px] h-[10px] rotate-45
-                ${alignRight ? 'right-4' : 'left-4'}`}
+      {createPortal(
+        <AnimatePresence>
+          {visible && (
+            <motion.div
+              initial={{ opacity: 0, y: -6, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.95 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               style={{
-                bottom: '-5px',
-                background: '#1a2035',
-                borderBottom: '1px solid rgba(255,255,255,0.14)',
-                borderRight: '1px solid rgba(255,255,255,0.14)',
+                position: 'fixed',
+                top: pos.top,
+                left: pos.left,
+                width: TOOLTIP_WIDTH,
+                zIndex: 99999,
+                pointerEvents: 'none',
+                background: 'linear-gradient(145deg, #1e2d40, #152030)',
+                border: '1px solid rgba(100,160,255,0.18)',
+                borderRadius: '14px',
+                padding: '11px 14px',
+                boxShadow: '0 24px 56px rgba(0,0,0,0.75), 0 4px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
               }}
-            />
-            <p className="text-[11.5px] text-gray-300 leading-relaxed">{content}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            >
+              {/* Upward caret at top */}
+              <div style={{
+                position: 'absolute',
+                top: '-5px',
+                ...(alignRight ? { right: '14px' } : { left: '14px' }),
+                width: '10px',
+                height: '10px',
+                background: '#1e2d40',
+                borderTop: '1px solid rgba(100,160,255,0.18)',
+                borderLeft: '1px solid rgba(100,160,255,0.18)',
+                transform: 'rotate(45deg)',
+              }} />
+              <p style={{
+                fontSize: '12px',
+                color: '#cbd5e1',
+                lineHeight: 1.6,
+                margin: 0,
+                position: 'relative',
+                zIndex: 1,
+              }}>
+                {content}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
   );
 }
 
@@ -130,13 +163,13 @@ export function StatsOverview({ dailyLogs, currentScore, maxScore, streak }: Sta
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: index * 0.05 }}
-          className={`bg-white/5 border ${stat.borderColor} rounded-2xl p-3.5 sm:p-4 hover:bg-white/[0.07] transition-all hover:shadow-lg`}
+          className={`bg-white/5 border ${stat.borderColor} rounded-2xl p-4 sm:p-5 hover:bg-white/[0.07] transition-all hover:shadow-lg`}
         >
           <div className="flex items-start justify-between mb-3">
             <StatTooltip content={stat.tooltip} alignRight={index % 2 === 1}>
               <div className="flex items-center gap-1.5 cursor-help group">
                 <p className="text-xs sm:text-sm text-gray-400">{stat.label}</p>
-                <HelpCircle className="w-3 h-3 text-gray-600 group-hover:text-gray-400 transition-colors" />
+                <HelpCircle className="w-3 h-3 text-gray-500 group-hover:text-gray-300 transition-colors" />
               </div>
             </StatTooltip>
             <div className={`p-1.5 ${stat.bgColor} rounded-lg`}>

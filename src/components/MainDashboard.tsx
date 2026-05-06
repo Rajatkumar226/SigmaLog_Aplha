@@ -408,7 +408,7 @@ export function MainDashboard({
                   borderRadius: '18px',
                 }}
               >
-                <p className="text-xs text-gray-600 mb-2 uppercase tracking-widest">Daily Verdict</p>
+                <p className="text-xs text-gray-400 mb-2 uppercase tracking-widest">Daily Verdict</p>
                 <motion.p
                   key={getDailyFeedback()}
                   initial={{ opacity: 0, y: 4 }}
@@ -419,7 +419,7 @@ export function MainDashboard({
                 >
                   {getDailyFeedback()}
                 </motion.p>
-                <p className="text-xs text-gray-600 mt-1">{getIdentityStatus()}</p>
+                <p className="text-xs text-gray-400 mt-1">{getIdentityStatus()}</p>
               </motion.div>
             )}
           </div>
