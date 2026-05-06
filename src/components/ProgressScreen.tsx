@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { TrendingUp, Award } from 'lucide-react';
+import { TrendingUp, Award, Share2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { Header } from './Header';
 import { ShadowStats } from './ShadowStats';
+import { ShareProgressModal } from './ShareProgressModal';
 import * as excuseService from '../services/excuseService';
 import type { Habit, DailyLog } from '../App';
 import '../styles/ExcuseWall.scss';
@@ -11,6 +12,7 @@ import '../styles/ExcuseWall.scss';
 interface ProgressScreenProps {
   habits: Habit[];
   dailyLogs: DailyLog[];
+  streak: number;
   onNavigate: (screen: 'dashboard' | 'progress' | 'settings') => void;
 }
 
@@ -21,8 +23,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   Discipline: '#10b981',
 };
 
-export function ProgressScreen({ habits, dailyLogs, onNavigate }: ProgressScreenProps) {
+export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: ProgressScreenProps) {
   const [weekExcuses, setWeekExcuses] = useState<excuseService.ExcuseRecord[]>([]);
+  const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
     excuseService.getWeekExcuses().then(setWeekExcuses);
@@ -113,7 +116,18 @@ export function ProgressScreen({ habits, dailyLogs, onNavigate }: ProgressScreen
     <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <Header onNavigate={onNavigate} currentScreen="progress" />
+        <div className="flex items-center justify-between">
+          <Header onNavigate={onNavigate} currentScreen="progress" />
+          <button
+            onClick={() => setShowShare(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-500/15
+              hover:bg-indigo-500/25 border border-indigo-500/25 text-indigo-300
+              text-sm font-medium transition-all"
+          >
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
+        </div>
 
         {/* Stats Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
@@ -422,6 +436,14 @@ export function ProgressScreen({ habits, dailyLogs, onNavigate }: ProgressScreen
           </motion.div>
         )}
       </div>
+
+      {showShare && (
+        <ShareProgressModal
+          streak={streak}
+          dailyLogs={dailyLogs}
+          onClose={() => setShowShare(false)}
+        />
+      )}
     </div>
   );
 }

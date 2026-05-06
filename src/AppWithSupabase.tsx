@@ -357,6 +357,7 @@ export default function App() {
         <ProgressScreen
           habits={uiHabits}
           dailyLogs={dailyLogs}
+          streak={streak}
           onNavigate={setCurrentScreen}
         />
       )}
