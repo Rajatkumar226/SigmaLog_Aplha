@@ -153,92 +153,150 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
 
   return (
     <AnimatePresence>
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)' }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-5"
+        style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)' }}
         onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       >
+        {/* Modal card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.92, y: 24 }}
           animate={{ opacity: 1, scale: 1,    y: 0  }}
-          exit={{    opacity: 0, scale: 0.95, y: 20  }}
-          transition={{ type: 'spring', damping: 26, stiffness: 300 }}
-          className="w-full bg-[#0f1421] border border-white/10 rounded-2xl overflow-hidden"
+          exit={{    opacity: 0, scale: 0.92, y: 24  }}
+          transition={{ type: 'spring', damping: 24, stiffness: 280 }}
+          className="w-full relative"
           style={{ maxWidth: 360 }}
         >
-          {/* ── Header ── */}
-          <div className="flex items-center justify-between px-5 pt-5 pb-4">
-            <p className="font-semibold text-base text-white">Share Progress</p>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-xl hover:bg-white/8 transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4 text-gray-400" />
-            </button>
-          </div>
+          {/* Subtle outer glow */}
+          <div
+            className="absolute -inset-px rounded-3xl pointer-events-none"
+            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.15), transparent 60%)', borderRadius: 24 }}
+          />
 
-          {/* ── Period tabs ── */}
-          <div className="flex gap-1.5 px-5 pb-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-            {PERIODS.map(p => (
-              <button
-                key={p.key}
-                onClick={() => setPeriod(p.key)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                  period === p.key
-                    ? 'bg-indigo-500/25 text-indigo-300 border border-indigo-500/40'
-                    : 'bg-white/5 text-gray-500 border border-white/8 hover:text-gray-300 hover:bg-white/8'
-                }`}
+          <div
+            className="relative rounded-3xl overflow-hidden"
+            style={{ background: '#0f1421', border: '1px solid rgba(255,255,255,0.10)' }}
+          >
+            {/* ── Header ─────────────────────────────────── */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-5">
+              <div>
+                <p className="font-bold text-base text-white tracking-tight">Share Progress</p>
+                <p className="text-xs text-gray-500 mt-0.5">Inspire others with your discipline</p>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                onClick={onClose}
+                className="p-2 rounded-2xl cursor-pointer"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
-          {/* ── Card preview (square) ── */}
-          <div className="px-5 pb-4">
-            <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-[#0a0e1a]">
-              {loading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-white/15 border-t-white/60 rounded-full animate-spin" />
-                </div>
-              )}
-              {imgUrl && (
-                <img
-                  src={imgUrl}
-                  alt="Progress card"
-                  className={`w-full h-full object-cover transition-opacity duration-200 ${loading ? 'opacity-0' : 'opacity-100'}`}
-                />
-              )}
+                <X className="w-4 h-4 text-gray-400" />
+              </motion.button>
             </div>
-          </div>
 
-          {/* ── Share button ── */}
-          <div className="px-5 pb-5">
-            <button
-              onClick={handleShare}
-              disabled={sharing || loading}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5
-                bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700
-                text-white text-sm font-semibold rounded-xl
-                transition-all disabled:opacity-50 cursor-pointer"
-            >
-              {sharing
-                ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                : <Share2 className="w-4 h-4" />
-              }
-              {sharing ? 'Opening...' : 'Share'}
-            </button>
+            {/* ── Period pills ────────────────────────────── */}
+            <div className="px-6 pb-5">
+              <div
+                className="flex gap-2 overflow-x-auto pb-0.5"
+                style={{ scrollbarWidth: 'none' }}
+              >
+                {PERIODS.map(p => (
+                  <motion.button
+                    key={p.key}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setPeriod(p.key)}
+                    className="flex-shrink-0 px-4 py-2 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer"
+                    style={
+                      period === p.key
+                        ? {
+                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 14px rgba(99,102,241,0.40)',
+                            border: '1px solid rgba(139,92,246,0.5)',
+                          }
+                        : {
+                            background: 'rgba(255,255,255,0.05)',
+                            color: '#94a3b8',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                          }
+                    }
+                  >
+                    {p.label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
 
-            {/* ── Marketing line ── */}
-            <p className="text-center text-xs text-gray-600 mt-3 leading-relaxed">
-              Install SigmaLog →{' '}
-              <span className="text-gray-500">sigmalog.vercel.app</span>
-              <br />
-              <span className="text-gray-700">Discipline creates freedom.</span>
-            </p>
+            {/* ── Card preview ────────────────────────────── */}
+            <div className="px-6 pb-5">
+              <motion.div
+                key={period}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25 }}
+                className="relative w-full aspect-square rounded-2xl overflow-hidden"
+                style={{
+                  background: '#0a0e1a',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.08)',
+                }}
+              >
+                {loading && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+                    style={{ background: '#0a0e1a' }}>
+                    <div className="w-7 h-7 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin" />
+                    <p className="text-xs text-gray-600">Generating card…</p>
+                  </div>
+                )}
+                {imgUrl && (
+                  <motion.img
+                    src={imgUrl}
+                    alt="Progress card"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: loading ? 0 : 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </motion.div>
+            </div>
+
+            {/* ── Share button ────────────────────────────── */}
+            <div className="px-6 pb-3">
+              <motion.button
+                whileHover={{ scale: sharing || loading ? 1 : 1.02 }}
+                whileTap={{ scale: sharing || loading ? 1 : 0.98 }}
+                onClick={handleShare}
+                disabled={sharing || loading}
+                className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
+                  text-white text-sm font-bold tracking-wide
+                  transition-opacity disabled:opacity-50 cursor-pointer"
+                style={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  boxShadow: sharing || loading ? 'none' : '0 6px 20px rgba(99,102,241,0.45)',
+                }}
+              >
+                {sharing
+                  ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  : <Share2 className="w-4 h-4" />
+                }
+                {sharing ? 'Opening share…' : 'Share Now'}
+              </motion.button>
+            </div>
+
+            {/* ── Marketing line ──────────────────────────── */}
+            <div className="px-6 pb-6 pt-2 text-center">
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Install SigmaLog →{' '}
+                <span className="text-indigo-400 font-medium">sigmalog.vercel.app</span>
+              </p>
+              <p className="text-xs text-gray-700 mt-1">Discipline creates freedom.</p>
+            </div>
           </div>
         </motion.div>
       </motion.div>
