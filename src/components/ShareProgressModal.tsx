@@ -188,12 +188,12 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
           >
 
             {/* ── Header ────────────────────────────────── */}
-            <div className="flex items-center justify-between px-6 pt-7 pb-4">
+            <div className="flex items-center justify-between px-6 pt-8 pb-5">
               <div>
                 <p className="font-bold text-[15px] text-white tracking-tight leading-snug">
                   Share Progress
                 </p>
-                <p className="text-[11px] text-gray-500 mt-1 leading-tight">
+                <p className="text-[11px] text-gray-300 mt-1.5 leading-tight">
                   Inspire others with your discipline
                 </p>
               </div>
@@ -212,10 +212,10 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
             <div style={{ height: 1, background: 'rgba(255,255,255,0.055)', margin: '0 24px' }} />
 
             {/* ── Period pills ──────────────────────────── */}
-            <div className="px-6 pt-5 pb-5">
+            <div className="px-6 pt-5 pb-4">
               <div
-                className="flex gap-2 overflow-x-auto"
-                style={{ scrollbarWidth: 'none' }}
+                className="flex gap-2.5"
+                style={{ overflowX: 'auto', overflowY: 'hidden', scrollbarWidth: 'none' }}
               >
                 {PERIODS.map(p => (
                   <motion.button
@@ -223,7 +223,7 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setPeriod(p.key)}
-                    className="flex-shrink-0 px-4 py-2 text-[11px] font-semibold rounded-full cursor-pointer"
+                    className="flex-shrink-0 px-4 py-2.5 text-[11px] font-semibold rounded-full cursor-pointer"
                     style={
                       period === p.key
                         ? {
@@ -233,9 +233,9 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
                             border: '1px solid rgba(139,92,246,0.5)',
                           }
                         : {
-                            background: 'rgba(255,255,255,0.05)',
-                            color: '#94a3b8',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            background: 'rgba(255,255,255,0.06)',
+                            color: '#e2e8f0',
+                            border: '1px solid rgba(255,255,255,0.12)',
                           }
                     }
                   >
@@ -282,16 +282,17 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
             </div>
 
             {/* ── Share button ──────────────────────────── */}
-            <div className="px-6 pb-4">
+            <div className="px-6 pb-5">
               <motion.button
                 whileHover={{ scale: sharing || loading ? 1 : 1.02 }}
                 whileTap={{ scale: sharing || loading ? 1 : 0.98 }}
                 onClick={handleShare}
                 disabled={sharing || loading}
-                className="w-full flex items-center justify-center gap-2.5 py-[14px] rounded-2xl
+                className="w-full flex items-center justify-center gap-2.5 rounded-2xl
                   text-white text-sm font-bold tracking-wide
                   transition-opacity disabled:opacity-50 cursor-pointer"
                 style={{
+                  height: 56,
                   background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                   boxShadow: sharing || loading ? 'none' : '0 6px 20px rgba(99,102,241,0.45)',
                 }}
@@ -305,12 +306,12 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
             </div>
 
             {/* ── Marketing line ────────────────────────── */}
-            <div className="px-6 pt-1 pb-7 text-center">
-              <p className="text-[11px] text-gray-500 leading-relaxed">
+            <div className="px-6 pt-1 pb-8 text-center">
+              <p className="text-[12px] text-gray-300 leading-relaxed">
                 Install SigmaLog →{' '}
-                <span className="text-indigo-400 font-medium">sigmalog.vercel.app</span>
+                <span className="text-indigo-400 font-semibold">sigmalog.vercel.app</span>
               </p>
-              <p className="text-[11px] text-gray-700 mt-1.5 tracking-wide">
+              <p className="text-[11px] text-gray-400 mt-2 tracking-wide">
                 Discipline creates freedom.
               </p>
             </div>
