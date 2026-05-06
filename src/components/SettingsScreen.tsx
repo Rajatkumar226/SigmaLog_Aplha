@@ -409,7 +409,7 @@ export function SettingsScreen({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-4 py-4 bg-white/3 rounded-2xl">
+                    <div className="px-5 py-5 bg-white/3 rounded-2xl">
                       <label className="block text-xs text-gray-400 uppercase tracking-widest mb-3">
                         Remind me at
                       </label>
@@ -417,7 +417,7 @@ export function SettingsScreen({
                         type="time"
                         value={reminderTime}
                         onChange={(e) => handleReminderTimeChange(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl
                           outline-none focus:border-green-500/30 transition-colors text-sm"
                       />
                     </div>
@@ -456,7 +456,7 @@ export function SettingsScreen({
               <button
                 onClick={handleInstallClick}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3
-                  bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl
+                  bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl
                   transition-all cursor-pointer text-sm font-medium mb-4"
               >
                 <Download className="w-4 h-4" />
@@ -527,7 +527,7 @@ export function SettingsScreen({
           <a
             href="mailto:rajat8615226@gmail.com?subject=SigmaLog Feedback"
             className="flex items-center justify-center gap-2 w-full px-4 py-3
-              bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl
+              bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl
               transition-all text-sm font-medium cursor-pointer"
           >
             <MessageSquare className="w-4 h-4" />
