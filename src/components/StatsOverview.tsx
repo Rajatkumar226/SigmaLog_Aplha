@@ -22,7 +22,7 @@ function StatTooltip({
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="relative" style={{ isolation: 'isolate' }}>
+    <div className="relative">
       <div
         onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
@@ -34,32 +34,34 @@ function StatTooltip({
       <AnimatePresence>
         {visible && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -4 }}
+            initial={{ opacity: 0, scale: 0.93, y: 4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -4 }}
+            exit={{ opacity: 0, scale: 0.93, y: 4 }}
             transition={{ duration: 0.14, ease: 'easeOut' }}
-            className={`absolute z-[9999] top-[calc(100%+10px)] pointer-events-none w-44
+            className={`absolute pointer-events-none w-44
               ${alignRight ? 'right-0' : 'left-0'}`}
             style={{
-              background: 'linear-gradient(145deg, #131929, #0d1220)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              bottom: 'calc(100% + 10px)',
+              background: 'linear-gradient(145deg, #1a2035, #111827)',
+              border: '1px solid rgba(255,255,255,0.14)',
               borderRadius: '14px',
               padding: '10px 13px',
-              boxShadow: '0 16px 40px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)',
+              zIndex: 9999,
+              boxShadow: '0 16px 40px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5)',
             }}
           >
-            {/* Caret arrow */}
+            {/* Downward caret arrow at bottom of tooltip */}
             <div
-              className={`absolute -top-[5px] w-[10px] h-[10px] rotate-45
+              className={`absolute w-[10px] h-[10px] rotate-45
                 ${alignRight ? 'right-4' : 'left-4'}`}
               style={{
-                background: '#131929',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderBottom: 'none',
-                borderRight: 'none',
+                bottom: '-5px',
+                background: '#1a2035',
+                borderBottom: '1px solid rgba(255,255,255,0.14)',
+                borderRight: '1px solid rgba(255,255,255,0.14)',
               }}
             />
-            <p className="relative z-10 text-[11.5px] text-gray-300 leading-relaxed">{content}</p>
+            <p className="text-[11.5px] text-gray-300 leading-relaxed">{content}</p>
           </motion.div>
         )}
       </AnimatePresence>
