@@ -384,23 +384,19 @@ export function SettingsScreen({
                 <button
                   onClick={() => handleNotificationToggle(!notificationsEnabled)}
                   disabled={requestingPermission || permissionStatus === 'denied'}
-                  className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
+                  className={`relative w-12 h-6 rounded-full transition-all duration-200 flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
                     notificationsEnabled && permissionStatus === 'granted'
-                      ? "bg-green-500/50"
-                      : "bg-white/10"
+                      ? "bg-green-500"
+                      : "bg-white/15"
                   }`}
                 >
                   {requestingPermission ? (
-                    <div className="absolute top-1 left-1 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="absolute top-1 left-1 w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                   ) : (
                     <motion.div
                       animate={{ x: notificationsEnabled && permissionStatus === 'granted' ? 24 : 2 }}
-                      transition={{ duration: 0.2 }}
-                      className={`absolute top-1 w-4 h-4 rounded-full ${
-                        notificationsEnabled && permissionStatus === 'granted'
-                          ? "bg-green-400"
-                          : "bg-gray-500"
-                      }`}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      className="absolute top-1 left-0 w-4 h-4 rounded-full bg-white shadow-md"
                     />
                   )}
                 </button>
