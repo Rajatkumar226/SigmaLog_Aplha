@@ -93,7 +93,6 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
   const data = buildShareData(dailyLogs, period, streak);
   const text = buildText(period, streak, data.avgScore, data.daysLogged, data.totalDays, data.todayScore, data.todayMaxScore);
 
-  // Regenerate preview whenever period changes
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -126,7 +125,6 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
       const blob = await getBlob();
       const file = new File([blob], 'sigmalog-progress.png', { type: 'image/png' });
 
-      // Try native share with file (works on Android + iOS Safari 15+)
       if (navigator.share) {
         const shareData: ShareData = navigator.canShare?.({ files: [file] })
           ? { files: [file], title: 'My SigmaLog Progress', text }
@@ -136,7 +134,6 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
         return;
       }
 
-      // Desktop / unsupported: try WhatsApp web fallback, else save
       const opened = await tryDeepLink(`whatsapp://send?text=${encodeURIComponent(text)}`);
       if (!opened) {
         saveFile(blob);
@@ -169,39 +166,55 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
           exit={{    opacity: 0, scale: 0.92, y: 24  }}
           transition={{ type: 'spring', damping: 24, stiffness: 280 }}
           className="w-full relative"
-          style={{ maxWidth: 360 }}
+          style={{ maxWidth: 360, borderRadius: 28 }}
         >
-          {/* Subtle outer glow */}
+          {/* Outer glow ring */}
           <div
-            className="absolute -inset-px rounded-3xl pointer-events-none"
-            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.15), transparent 60%)', borderRadius: 24 }}
+            className="absolute -inset-px pointer-events-none"
+            style={{
+              borderRadius: 28,
+              background: 'linear-gradient(135deg, rgba(99,102,241,0.35), rgba(139,92,246,0.18), transparent 60%)',
+            }}
           />
 
+          {/* Main card surface */}
           <div
-            className="relative rounded-3xl overflow-hidden"
-            style={{ background: '#0f1421', border: '1px solid rgba(255,255,255,0.10)' }}
+            className="relative overflow-hidden"
+            style={{
+              borderRadius: 26,
+              background: '#0f1421',
+              border: '1px solid rgba(255,255,255,0.10)',
+            }}
           >
-            {/* ── Header ─────────────────────────────────── */}
-            <div className="flex items-center justify-between px-6 pt-6 pb-5">
+
+            {/* ── Header ────────────────────────────────── */}
+            <div className="flex items-center justify-between px-6 pt-7 pb-4">
               <div>
-                <p className="font-bold text-base text-white tracking-tight">Share Progress</p>
-                <p className="text-xs text-gray-500 mt-0.5">Inspire others with your discipline</p>
+                <p className="font-bold text-[15px] text-white tracking-tight leading-snug">
+                  Share Progress
+                </p>
+                <p className="text-[11px] text-gray-500 mt-1 leading-tight">
+                  Inspire others with your discipline
+                </p>
               </div>
               <motion.button
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
                 onClick={onClose}
-                className="p-2 rounded-2xl cursor-pointer"
+                className="p-2 rounded-2xl cursor-pointer flex-shrink-0"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <X className="w-4 h-4 text-gray-400" />
               </motion.button>
             </div>
 
-            {/* ── Period pills ────────────────────────────── */}
-            <div className="px-6 pb-5">
+            {/* Divider */}
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.055)', margin: '0 24px' }} />
+
+            {/* ── Period pills ──────────────────────────── */}
+            <div className="px-6 pt-5 pb-5">
               <div
-                className="flex gap-2 overflow-x-auto pb-0.5"
+                className="flex gap-2 overflow-x-auto"
                 style={{ scrollbarWidth: 'none' }}
               >
                 {PERIODS.map(p => (
@@ -210,13 +223,13 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setPeriod(p.key)}
-                    className="flex-shrink-0 px-4 py-2 text-xs font-semibold rounded-full transition-all duration-200 cursor-pointer"
+                    className="flex-shrink-0 px-4 py-2 text-[11px] font-semibold rounded-full cursor-pointer"
                     style={
                       period === p.key
                         ? {
                             background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                             color: '#ffffff',
-                            boxShadow: '0 4px 14px rgba(99,102,241,0.40)',
+                            boxShadow: '0 4px 14px rgba(99,102,241,0.42)',
                             border: '1px solid rgba(139,92,246,0.5)',
                           }
                         : {
@@ -232,25 +245,27 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
               </div>
             </div>
 
-            {/* ── Card preview ────────────────────────────── */}
+            {/* ── Card preview ──────────────────────────── */}
             <div className="px-6 pb-5">
               <motion.div
                 key={period}
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.25 }}
-                className="relative w-full aspect-square rounded-2xl overflow-hidden"
+                className="relative w-full overflow-hidden"
                 style={{
+                  aspectRatio: '1 / 1',
+                  borderRadius: 18,
                   background: '#0a0e1a',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.08)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.07)',
                 }}
               >
                 {loading && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3"
                     style={{ background: '#0a0e1a' }}>
-                    <div className="w-7 h-7 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin" />
-                    <p className="text-xs text-gray-600">Generating card…</p>
+                    <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin" />
+                    <p className="text-[11px] text-gray-600 tracking-wide">Generating card…</p>
                   </div>
                 )}
                 {imgUrl && (
@@ -266,14 +281,14 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
               </motion.div>
             </div>
 
-            {/* ── Share button ────────────────────────────── */}
-            <div className="px-6 pb-3">
+            {/* ── Share button ──────────────────────────── */}
+            <div className="px-6 pb-4">
               <motion.button
                 whileHover={{ scale: sharing || loading ? 1 : 1.02 }}
                 whileTap={{ scale: sharing || loading ? 1 : 0.98 }}
                 onClick={handleShare}
                 disabled={sharing || loading}
-                className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl
+                className="w-full flex items-center justify-center gap-2.5 py-[14px] rounded-2xl
                   text-white text-sm font-bold tracking-wide
                   transition-opacity disabled:opacity-50 cursor-pointer"
                 style={{
@@ -289,14 +304,17 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
               </motion.button>
             </div>
 
-            {/* ── Marketing line ──────────────────────────── */}
-            <div className="px-6 pb-6 pt-2 text-center">
-              <p className="text-xs text-gray-500 leading-relaxed">
+            {/* ── Marketing line ────────────────────────── */}
+            <div className="px-6 pt-1 pb-7 text-center">
+              <p className="text-[11px] text-gray-500 leading-relaxed">
                 Install SigmaLog →{' '}
                 <span className="text-indigo-400 font-medium">sigmalog.vercel.app</span>
               </p>
-              <p className="text-xs text-gray-700 mt-1">Discipline creates freedom.</p>
+              <p className="text-[11px] text-gray-700 mt-1.5 tracking-wide">
+                Discipline creates freedom.
+              </p>
             </div>
+
           </div>
         </motion.div>
       </motion.div>

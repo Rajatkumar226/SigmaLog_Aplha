@@ -79,12 +79,12 @@ function drawStats(
 
   stats.forEach((s, i) => {
     ctx.font = `700 64px ${FONT}`;
-    ctx.fillStyle = '#e2e8f0';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText(s.value, cols[i], statsY);
 
     ctx.font = `400 27px ${FONT}`;
-    ctx.fillStyle = '#475569';
+    ctx.fillStyle = '#64748b';
     ctx.fillText(s.label, cols[i], statsY + 46);
   });
 
@@ -156,7 +156,7 @@ function drawDailyCard(ctx: CanvasRenderingContext2D, data: ShareImageData) {
   ctx.fillText(`${pct}%`, S / 2, S * 0.52);
 
   ctx.font = `600 44px ${FONT}`;
-  ctx.fillStyle = '#475569';
+  ctx.fillStyle = '#64748b';
   ctx.fillText("today's score", S / 2, S * 0.60);
 
   drawDivider(ctx, S * 0.675);
@@ -200,7 +200,7 @@ function drawPeriodCard(ctx: CanvasRenderingContext2D, data: ShareImageData) {
   ctx.fillText(digits, S / 2, S * 0.505);
 
   ctx.font = `600 46px ${FONT}`;
-  ctx.fillStyle = '#475569';
+  ctx.fillStyle = '#64748b';
   ctx.textAlign = 'center';
   ctx.fillText('day streak', S / 2, S * 0.597);
 
