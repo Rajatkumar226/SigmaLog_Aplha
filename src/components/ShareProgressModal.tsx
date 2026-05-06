@@ -27,10 +27,10 @@ function buildShareData(logs: DailyLog[], period: SharePeriod, streak: number) {
     return {
       period, streak,
       avgScore: 0, daysLogged: 0, totalDays: 1, perfectDays: 0,
-      todayScore:       todayLog?.score ?? 0,
-      todayMaxScore:    todayLog?.maxScore ?? 0,
-      habitsCompleted:  todayLog?.completedHabits.length ?? 0,
-      totalHabits:      todayLog?.maxScore ?? 0,
+      todayScore:      todayLog?.score ?? 0,
+      todayMaxScore:   todayLog?.maxScore ?? 0,
+      habitsCompleted: todayLog?.completedHabits.length ?? 0,
+      totalHabits:     todayLog?.maxScore ?? 0,
     };
   }
 
@@ -66,7 +66,13 @@ function buildText(period: SharePeriod, streak: number, avg: number, daysLogged:
 function tryDeepLink(url: string): Promise<boolean> {
   return new Promise(resolve => {
     let done = false;
-    const finish = (v: boolean) => { if (done) return; done = true; window.removeEventListener('blur', onBlur); clearTimeout(t); resolve(v); };
+    const finish = (v: boolean) => {
+      if (done) return;
+      done = true;
+      window.removeEventListener('blur', onBlur);
+      clearTimeout(t);
+      resolve(v);
+    };
     const onBlur = () => finish(true);
     const t = setTimeout(() => finish(false), 2200);
     window.addEventListener('blur', onBlur);
@@ -83,10 +89,10 @@ function saveFile(blob: Blob) {
 }
 
 export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgressModalProps) {
-  const [period, setPeriod]     = useState<SharePeriod>('daily');
-  const [imgUrl, setImgUrl]     = useState<string | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [sharing, setSharing]   = useState(false);
+  const [period, setPeriod]   = useState<SharePeriod>('daily');
+  const [imgUrl, setImgUrl]   = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sharing, setSharing] = useState(false);
   const blobRef = useRef<Blob | null>(null);
   const urlRef  = useRef<string | null>(null);
 
@@ -137,7 +143,7 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
       const opened = await tryDeepLink(`whatsapp://send?text=${encodeURIComponent(text)}`);
       if (!opened) {
         saveFile(blob);
-        toast.success('Image saved — share it on any platform!');
+        toast.success('Image saved — share it anywhere!');
       }
     } catch (e) {
       if ((e as Error).name !== 'AbortError') {
@@ -150,94 +156,155 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
 
   return (
     <AnimatePresence>
-      {/* Backdrop */}
+      {/* ── Backdrop ──────────────────────────────────────── */}
       <motion.div
+        key="backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-5"
-        style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)' }}
+        transition={{ duration: 0.22 }}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 50,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 20,
+          background: 'rgba(0,0,0,0.82)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+        }}
         onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       >
-        {/* Modal card */}
+
+        {/* ── Modal wrapper ─────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 24 }}
+          key="modal"
+          initial={{ opacity: 0, scale: 0.86, y: 40 }}
           animate={{ opacity: 1, scale: 1,    y: 0  }}
-          exit={{    opacity: 0, scale: 0.92, y: 24  }}
-          transition={{ type: 'spring', damping: 24, stiffness: 280 }}
-          className="w-full relative"
-          style={{ maxWidth: 360, borderRadius: 28 }}
+          exit={{    opacity: 0, scale: 0.90, y: 20  }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28, mass: 0.9 }}
+          style={{ width: '100%', maxWidth: 400, position: 'relative' }}
         >
-          {/* Outer glow ring */}
-          <div
-            className="absolute -inset-px pointer-events-none"
-            style={{
-              borderRadius: 28,
-              background: 'linear-gradient(135deg, rgba(99,102,241,0.35), rgba(139,92,246,0.18), transparent 60%)',
-            }}
-          />
+          {/* Ambient glow behind card */}
+          <div style={{
+            position: 'absolute',
+            inset: '-20px -20px -40px',
+            background: 'radial-gradient(ellipse at 50% 60%, rgba(99,102,241,0.18) 0%, transparent 70%)',
+            pointerEvents: 'none',
+            borderRadius: 40,
+          }} />
 
-          {/* Main card surface */}
-          <div
-            className="relative overflow-hidden"
-            style={{
-              borderRadius: 26,
-              background: '#0f1421',
-              border: '1px solid rgba(255,255,255,0.10)',
-            }}
-          >
+          {/* ── Card ──────────────────────────────────────── */}
+          <div style={{
+            position: 'relative',
+            borderRadius: 28,
+            overflow: 'hidden',
+            background: 'linear-gradient(160deg, #131929 0%, #0d1220 60%, #111827 100%)',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)',
+          }}>
 
-            {/* ── Header ────────────────────────────────── */}
-            <div className="flex items-center justify-between px-6 pt-8 pb-5">
+            {/* Top accent gradient bar */}
+            <div style={{
+              height: 4,
+              background: 'linear-gradient(90deg, transparent 0%, #6366f1 30%, #8b5cf6 70%, transparent 100%)',
+            }} />
+
+            {/* ── Header ──────────────────────────────────── */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              padding: '24px 24px 0',
+            }}>
               <div>
-                <p className="font-bold text-[15px] text-white tracking-tight leading-snug">
+                <h2 style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: '#ffffff',
+                  letterSpacing: '-0.5px',
+                  lineHeight: 1.2,
+                  margin: 0,
+                }}>
                   Share Progress
-                </p>
-                <p className="text-[11px] text-gray-300 mt-1.5 leading-tight">
-                  Inspire others with your discipline
+                </h2>
+                <p style={{
+                  fontSize: 13,
+                  color: '#94a3b8',
+                  marginTop: 6,
+                  lineHeight: 1.45,
+                }}>
+                  Show the world your sigma discipline
                 </p>
               </div>
+
               <motion.button
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 22 }}
                 onClick={onClose}
-                className="p-2 rounded-2xl cursor-pointer flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{
+                  flexShrink: 0,
+                  marginTop: 2,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#94a3b8',
+                }}
               >
-                <X className="w-4 h-4 text-gray-400" />
+                <X size={16} />
               </motion.button>
             </div>
 
             {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.055)', margin: '0 24px' }} />
+            <div style={{
+              height: 1,
+              background: 'rgba(255,255,255,0.06)',
+              margin: '20px 24px 0',
+            }} />
 
-            {/* ── Period pills ──────────────────────────── */}
-            <div className="px-6 pt-5 pb-4">
-              <div
-                className="flex gap-2.5"
-                style={{ overflowX: 'auto', overflowY: 'hidden', scrollbarWidth: 'none' }}
-              >
+            {/* ── Period tabs ─────────────────────────────── */}
+            <div style={{ padding: '18px 24px 0' }}>
+              <div style={{
+                display: 'flex',
+                gap: 8,
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                scrollbarWidth: 'none',
+              }}>
                 {PERIODS.map(p => (
                   <motion.button
                     key={p.key}
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.94 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 26 }}
                     onClick={() => setPeriod(p.key)}
-                    className="flex-shrink-0 px-4 py-2.5 text-[11px] font-semibold rounded-full cursor-pointer"
-                    style={
-                      period === p.key
+                    style={{
+                      flexShrink: 0,
+                      padding: '9px 18px',
+                      borderRadius: 100,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      letterSpacing: '-0.1px',
+                      cursor: 'pointer',
+                      lineHeight: 1,
+                      ...(period === p.key
                         ? {
-                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                            background: 'linear-gradient(135deg, #6366f1, #7c3aed)',
                             color: '#ffffff',
-                            boxShadow: '0 4px 14px rgba(99,102,241,0.42)',
-                            border: '1px solid rgba(139,92,246,0.5)',
+                            boxShadow: '0 4px 18px rgba(99,102,241,0.55)',
+                            border: '1px solid rgba(139,92,246,0.6)',
                           }
                         : {
-                            background: 'rgba(255,255,255,0.06)',
-                            color: '#e2e8f0',
-                            border: '1px solid rgba(255,255,255,0.12)',
+                            background: 'rgba(255,255,255,0.07)',
+                            color: '#cbd5e1',
+                            border: '1px solid rgba(255,255,255,0.09)',
                           }
-                    }
+                      ),
+                    }}
                   >
                     {p.label}
                   </motion.button>
@@ -245,27 +312,41 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
               </div>
             </div>
 
-            {/* ── Card preview ──────────────────────────── */}
-            <div className="px-6 pb-5">
+            {/* ── Card preview ────────────────────────────── */}
+            <div style={{ padding: '20px 24px 0' }}>
               <motion.div
                 key={period}
-                initial={{ opacity: 0, scale: 0.97 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.25 }}
-                className="relative w-full overflow-hidden"
+                initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                animate={{ opacity: 1, scale: 1,    y: 0 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 28 }}
                 style={{
+                  position: 'relative',
+                  width: '100%',
                   aspectRatio: '1 / 1',
-                  borderRadius: 18,
+                  borderRadius: 20,
+                  overflow: 'hidden',
                   background: '#0a0e1a',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.07)',
+                  boxShadow: '0 20px 56px rgba(0,0,0,0.65), 0 0 0 1px rgba(99,102,241,0.14)',
                 }}
               >
                 {loading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                    style={{ background: '#0a0e1a' }}>
-                    <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin" />
-                    <p className="text-[11px] text-gray-600 tracking-wide">Generating card…</p>
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    gap: 14,
+                    background: '#0a0e1a',
+                  }}>
+                    <div style={{
+                      width: 28, height: 28,
+                      borderRadius: '50%',
+                      border: '2.5px solid rgba(99,102,241,0.2)',
+                      borderTopColor: '#818cf8',
+                      animation: 'spin 0.8s linear infinite',
+                    }} className="animate-spin" />
+                    <p style={{ fontSize: 12, color: '#475569', letterSpacing: '0.04em' }}>
+                      Generating card…
+                    </p>
                   </div>
                 )}
                 {imgUrl && (
@@ -274,44 +355,75 @@ export function ShareProgressModal({ streak, dailyLogs, onClose }: ShareProgress
                     alt="Progress card"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: loading ? 0 : 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full h-full object-cover"
+                    transition={{ duration: 0.35 }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
                 )}
               </motion.div>
             </div>
 
-            {/* ── Share button ──────────────────────────── */}
-            <div className="px-6 pb-5">
+            {/* ── Share button ────────────────────────────── */}
+            <div style={{ padding: '20px 24px 0' }}>
               <motion.button
-                whileHover={{ scale: sharing || loading ? 1 : 1.02 }}
-                whileTap={{ scale: sharing || loading ? 1 : 0.98 }}
+                whileHover={{ scale: sharing || loading ? 1 : 1.025 }}
+                whileTap={{ scale: sharing || loading ? 1 : 0.975 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 22 }}
                 onClick={handleShare}
                 disabled={sharing || loading}
-                className="w-full flex items-center justify-center gap-2.5 rounded-2xl
-                  text-white text-sm font-bold tracking-wide
-                  transition-opacity disabled:opacity-50 cursor-pointer"
                 style={{
-                  height: 56,
-                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                  boxShadow: sharing || loading ? 'none' : '0 6px 20px rgba(99,102,241,0.45)',
+                  width: '100%',
+                  height: 58,
+                  borderRadius: 16,
+                  border: 'none',
+                  background: sharing || loading
+                    ? 'rgba(99,102,241,0.45)'
+                    : 'linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)',
+                  boxShadow: sharing || loading
+                    ? 'none'
+                    : '0 8px 28px rgba(99,102,241,0.55), inset 0 1px 0 rgba(255,255,255,0.12)',
+                  color: '#ffffff',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: '0.01em',
+                  cursor: sharing || loading ? 'default' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  opacity: loading ? 0.65 : 1,
+                  transition: 'background 0.2s, box-shadow 0.2s, opacity 0.2s',
                 }}
               >
                 {sharing
-                  ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  : <Share2 className="w-4 h-4" />
+                  ? (
+                    <div style={{
+                      width: 20, height: 20,
+                      borderRadius: '50%',
+                      border: '2.5px solid rgba(255,255,255,0.3)',
+                      borderTopColor: '#ffffff',
+                    }} className="animate-spin" />
+                  )
+                  : <Share2 size={19} />
                 }
-                {sharing ? 'Opening share…' : 'Share Now'}
+                <span>{sharing ? 'Sharing…' : 'Share Now'}</span>
               </motion.button>
             </div>
 
-            {/* ── Marketing line ────────────────────────── */}
-            <div className="px-6 pt-1 pb-8 text-center">
-              <p className="text-[12px] text-gray-300 leading-relaxed">
+            {/* ── Footer ──────────────────────────────────── */}
+            <div style={{
+              padding: '16px 24px 28px',
+              textAlign: 'center',
+            }}>
+              <p style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
                 Install SigmaLog →{' '}
-                <span className="text-indigo-400 font-semibold">sigmalog.vercel.app</span>
+                <span style={{ color: '#818cf8', fontWeight: 600 }}>sigmalog.vercel.app</span>
               </p>
-              <p className="text-[11px] text-gray-400 mt-2 tracking-wide">
+              <p style={{
+                fontSize: 11,
+                color: '#4b5563',
+                marginTop: 5,
+                letterSpacing: '0.05em',
+              }}>
                 Discipline creates freedom.
               </p>
             </div>
