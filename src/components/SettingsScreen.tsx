@@ -5,6 +5,7 @@ import {
   Trash2,
   AlertTriangle,
   Bell,
+  BellOff,
   MessageSquare,
   Shield,
   Smartphone,
@@ -16,6 +17,13 @@ import { Header } from "./Header";
 import { DataIntegrityIndicator } from "./DataIntegrityIndicator";
 import type { Habit } from "../App";
 import { STANDARD_CATEGORIES } from "../App";
+import {
+  isNotificationSupported,
+  getPermission,
+  requestPermission,
+  registerSW,
+  fireNotification,
+} from "../services/pushNotificationService";
 
 // Category selector component with custom option
 interface CategorySelectProps {
@@ -108,6 +116,10 @@ export function SettingsScreen({
   const [reminderTime, setReminderTime] = useState(() => {
     return localStorage.getItem("sigmalog_reminder_time") || "20:00";
   });
+  const [permissionStatus, setPermissionStatus] = useState<string>(() =>
+    isNotificationSupported() ? getPermission() : 'unsupported'
+  );
+  const [requestingPermission, setRequestingPermission] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showPwaInstructions, setShowPwaInstructions] = useState(false);
@@ -154,10 +166,33 @@ export function SettingsScreen({
     }
   };
 
-  // Save notification settings
-  const handleNotificationToggle = (enabled: boolean) => {
-    setNotificationsEnabled(enabled);
-    localStorage.setItem("sigmalog_notifications", enabled.toString());
+  const handleNotificationToggle = async (enabled: boolean) => {
+    if (enabled) {
+      if (!isNotificationSupported()) return;
+
+      setRequestingPermission(true);
+      const permission = await requestPermission();
+      setPermissionStatus(permission);
+      setRequestingPermission(false);
+
+      if (permission !== 'granted') {
+        // User denied — don't enable
+        return;
+      }
+
+      await registerSW();
+      setNotificationsEnabled(true);
+      localStorage.setItem("sigmalog_notifications", "true");
+
+      // Fire a confirmation notification so user knows it works
+      await fireNotification(
+        'SigmaLog — Notifications ON ✅',
+        `You'll be reminded at ${reminderTime} if you haven't logged.`
+      );
+    } else {
+      setNotificationsEnabled(false);
+      localStorage.setItem("sigmalog_notifications", "false");
+    }
   };
 
   const handleReminderTimeChange = (time: string) => {
@@ -288,55 +323,96 @@ export function SettingsScreen({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6"
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <Bell className="w-5 h-5" />
+          <div className="flex items-center gap-3 mb-5">
+            {notificationsEnabled && permissionStatus === 'granted'
+              ? <Bell className="w-5 h-5 text-green-400" />
+              : <BellOff className="w-5 h-5 text-gray-500" />
+            }
             <h3>Notifications</h3>
           </div>
 
-          {/* Enable Toggle */}
-          <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
-            <div>
-              <p className="text-sm mb-1">Daily Reminders</p>
-              <p className="text-xs text-gray-500">
-                No logs today yet. The mirror is still empty.
+          {/* Unsupported */}
+          {permissionStatus === 'unsupported' && (
+            <p className="text-xs text-gray-500 bg-white/5 rounded-xl px-4 py-3">
+              Your browser doesn't support notifications. Try installing the app on Android Chrome.
+            </p>
+          )}
+
+          {/* Denied */}
+          {permissionStatus === 'denied' && (
+            <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-4">
+              <BellOff className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-red-300 leading-relaxed">
+                Notifications are blocked. Open your browser settings → Site permissions → Notifications and allow sigmalog.vercel.app.
               </p>
             </div>
-            <button
-              onClick={() => handleNotificationToggle(!notificationsEnabled)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                notificationsEnabled ? "bg-green-500/30" : "bg-white/10"
-              }`}
-            >
-              <motion.div
-                animate={{ x: notificationsEnabled ? 24 : 2 }}
-                transition={{ duration: 0.2 }}
-                className={`absolute top-1 w-4 h-4 rounded-full ${
-                  notificationsEnabled ? "bg-green-500" : "bg-gray-400"
-                }`}
-              />
-            </button>
-          </div>
+          )}
 
-          {/* Time Selector */}
-          {notificationsEnabled && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <label className="block text-sm text-gray-400 mb-2">
-                Reminder Time
-              </label>
-              <input
-                type="time"
-                value={reminderTime}
-                onChange={(e) => handleReminderTimeChange(e.target.value)}
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg 
-                  outline-none focus:border-white/30 transition-colors"
-              />
-            </motion.div>
+          {permissionStatus !== 'unsupported' && (
+            <>
+              {/* Enable Toggle */}
+              <div className="flex items-center justify-between mb-5 pb-5 border-b border-white/10">
+                <div>
+                  <p className="text-sm font-medium mb-1">Daily Reminders</p>
+                  <p className="text-xs text-gray-500">
+                    {notificationsEnabled && permissionStatus === 'granted'
+                      ? `Reminds you at ${reminderTime} if you haven't logged.`
+                      : "Tap to enable. Browser will ask for permission."}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleNotificationToggle(!notificationsEnabled)}
+                  disabled={requestingPermission || permissionStatus === 'denied'}
+                  className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                    notificationsEnabled && permissionStatus === 'granted'
+                      ? "bg-green-500/40"
+                      : "bg-white/10"
+                  }`}
+                >
+                  {requestingPermission ? (
+                    <div className="absolute top-1 left-1 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <motion.div
+                      animate={{ x: notificationsEnabled && permissionStatus === 'granted' ? 24 : 2 }}
+                      transition={{ duration: 0.2 }}
+                      className={`absolute top-1 w-4 h-4 rounded-full ${
+                        notificationsEnabled && permissionStatus === 'granted'
+                          ? "bg-green-400"
+                          : "bg-gray-500"
+                      }`}
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* Time Selector */}
+              <AnimatePresence>
+                {notificationsEnabled && permissionStatus === 'granted' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <label className="block text-xs text-gray-400 uppercase tracking-widest mb-3">
+                      Reminder Time
+                    </label>
+                    <input
+                      type="time"
+                      value={reminderTime}
+                      onChange={(e) => handleReminderTimeChange(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl
+                        outline-none focus:border-green-500/40 transition-colors text-sm"
+                    />
+                    <p className="text-xs text-gray-600 mt-2">
+                      Notification fires if you haven't logged by this time. Works when your browser or PWA is running.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           )}
         </motion.div>
 

@@ -28,6 +28,12 @@ import { TimeCapsuleReveal } from './components/TimeCapsuleReveal';
 import { useAuth } from './hooks/useAuth';
 import { useHabits } from './hooks/useHabits';
 import { useDailyLogs } from './hooks/useDailyLogs';
+import {
+  registerSW,
+  checkAndNotify,
+  startReminderInterval,
+  stopReminderInterval,
+} from './services/pushNotificationService';
 import { useTimeCapsule } from './hooks/useTimeCapsule';
 import { toast } from 'sonner';
 
@@ -142,6 +148,22 @@ export default function App() {
       localStorage.setItem('sigmalog_screen', currentScreen);
     }
   }, [currentScreen, isAuthenticated]);
+
+  // Bootstrap push notifications once authenticated + logs loaded
+  useEffect(() => {
+    if (!isAuthenticated || habitsLoading) return;
+
+    // Register SW (no-op if already registered)
+    registerSW();
+
+    // Check on load: show notification if reminder time passed and not logged
+    checkAndNotify(dailyLogs);
+
+    // Check every minute while app is open
+    startReminderInterval(() => dailyLogs);
+
+    return () => stopReminderInterval();
+  }, [isAuthenticated, habitsLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Combine historical logs with today's data for UI components
   const dailyLogs: DailyLog[] = (() => {
