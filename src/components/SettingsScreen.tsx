@@ -237,7 +237,7 @@ export function SettingsScreen({
   };
 
   return (
-    <div className="min-h-screen px-6 py-8">
+    <div className="min-h-screen px-6 pt-12 pb-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <Header onNavigate={onNavigate} currentScreen="settings" />
@@ -246,7 +246,7 @@ export function SettingsScreen({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6"
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6"
         >
           <h3 className="mb-4">Edit Habits</h3>
 
@@ -258,7 +258,7 @@ export function SettingsScreen({
                   initial={{ opacity: 0, y: 20, height: 0 }}
                   animate={{ opacity: 1, y: 0, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-white/5 border border-white/10 rounded-lg p-4"
+                  className="bg-white/5 border border-white/10 rounded-2xl p-4"
                 >
                   <div className="flex flex-col md:flex-row lg:items-center gap-3 lg:gap-4">
                     <input
@@ -540,7 +540,7 @@ export function SettingsScreen({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-red-500/5 border border-red-500/20 rounded-lg p-6"
+          className="bg-red-500/5 border border-red-500/20 rounded-2xl p-6"
         >
           <h3 className="mb-2 text-red-400">Danger Zone</h3>
           <p className="text-sm text-gray-400 mb-4">
@@ -582,7 +582,7 @@ export function SettingsScreen({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/5 border border-white/10 rounded-lg p-6 mt-6"
+            className="bg-white/5 border border-white/10 rounded-2xl p-6 mt-6"
           >
             <h3 className="mb-2 text-gray-400">Account</h3>
             <p className="text-sm text-gray-400 mb-4">
