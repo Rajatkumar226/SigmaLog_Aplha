@@ -38,34 +38,41 @@ export function WeeklyOverview({ dailyLogs }: WeeklyOverviewProps) {
 
   return (
     <div>
-      <h3 className="mb-4">This Week</h3>
-      
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+      <h3 className="mb-4 text-sm font-semibold text-gray-300 uppercase tracking-widest">This Week</h3>
+
+      {/* Mobile: horizontal scroll | Desktop: 7-col grid */}
+      <div className="flex gap-2.5 overflow-x-auto pb-1 snap-x snap-mandatory
+        lg:grid lg:grid-cols-7 lg:gap-3 lg:overflow-visible lg:pb-0
+        [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {weekData.map((day, index) => (
           <motion.div
             key={day.date}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-            className={`bg-white/5 border rounded-lg p-4 hover:bg-white/[0.07] transition-all
-              ${day.isToday ? 'border-white/30 ring-2 ring-white/10' : 'border-white/10'}`}
+            transition={{ duration: 0.28, delay: index * 0.04 }}
+            className={`flex-shrink-0 w-[88px] snap-start lg:w-auto
+              rounded-2xl p-3 lg:p-4 transition-all
+              ${day.isToday
+                ? 'bg-white/[0.08] border border-white/25 ring-1 ring-white/10'
+                : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
+              }`}
           >
             <div className="text-center">
-              <p className={`text-sm mb-3 ${day.isToday ? 'text-white font-semibold' : 'text-gray-400'}`}>
+              <p className={`text-xs mb-2.5 font-medium ${day.isToday ? 'text-white' : 'text-gray-500'}`}>
                 {day.day}
-                {day.isToday && ' (Today)'}
+                {day.isToday && <span className="block text-[10px] text-gray-400 font-normal leading-tight">Today</span>}
               </p>
-              
+
               <div className="flex justify-center mb-2">
-                <CircularProgress 
-                  percentage={day.percentage} 
-                  size={60}
-                  strokeWidth={6}
+                <CircularProgress
+                  percentage={day.percentage}
+                  size={52}
+                  strokeWidth={5}
                 />
               </div>
-              
-              <p className="text-xs text-gray-500">
-                {day.score} / {day.maxScore}
+
+              <p className="text-[10px] text-gray-600">
+                {day.score}/{day.maxScore}
               </p>
             </div>
           </motion.div>

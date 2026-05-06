@@ -1,26 +1,16 @@
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.88) translateY(20px); }
+  from { opacity: 0; transform: scale(0.86) translateY(24px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes iconFloat {
   0%, 100% { transform: translateY(0) scale(1); }
-  45%       { transform: translateY(-8px) scale(1.04); }
+  45%       { transform: translateY(-9px) scale(1.05); }
 }
 
 @keyframes glowPulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50%       { opacity: 1;   transform: scale(1.08); }
-}
-
-@keyframes slideEnterRight {
-  from { opacity: 0; transform: translateX(28px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes slideExitLeft {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(-28px); }
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%       { opacity: 1;    transform: scale(1.1); }
 }
 
 @keyframes progressGrow {
@@ -32,154 +22,230 @@
   to   { transform: scaleX(1); opacity: 1; }
 }
 
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
 .onboarding-overlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .onboarding-modal {
   position: relative;
   width: 100%;
-  max-width: 420px;
-  background: linear-gradient(145deg, #0f1628 0%, #0a0e1a 100%);
-  border-radius: 24px;
+  max-width: 440px;
+  background: linear-gradient(160deg, #111827 0%, #0a0e1a 60%, #0c1020 100%);
+  border-radius: 28px;
   overflow: hidden;
-  animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: modalIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 
-  // Dynamic glow border — JS sets --accent-color custom property
   border: 1px solid var(--accent-border, rgba(255,255,255,0.1));
   box-shadow:
-    0 0 0 1px var(--accent-border, rgba(255,255,255,0.05)),
-    0 24px 64px rgba(0, 0, 0, 0.5),
-    0 0 80px var(--accent-glow, rgba(59,130,246,0.06));
+    0 0 0 1px var(--accent-border, rgba(255,255,255,0.04)),
+    0 32px 80px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 100px var(--accent-glow, rgba(59,130,246,0.07));
 
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 
+  // Accent stripe at top
   &__glow-stripe {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: var(--accent-gradient, linear-gradient(90deg, #3b82f6, #8b5cf6));
-    border-radius: 24px 24px 0 0;
+    border-radius: 28px 28px 0 0;
     transition: background 0.4s ease;
     animation: glowPulse 2.5s ease-in-out infinite;
+
+    // Shimmer overlay on stripe
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255,255,255,0.35) 50%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 2.2s linear infinite;
+    }
+  }
+
+  // Subtle corner glow decoration
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: var(--accent-glow, rgba(59,130,246,0.06));
+    pointer-events: none;
+    animation: glowPulse 4s ease-in-out infinite;
   }
 
   &__inner {
-    padding: 36px 32px 28px;
+    padding: 40px 32px 32px;
+
+    @media (max-width: 400px) {
+      padding: 36px 22px 26px;
+    }
   }
 
   &__skip {
     position: absolute;
-    top: 18px;
-    right: 18px;
-    font-size: 12px;
-    color: #4b5563;
-    background: none;
-    border: none;
+    top: 16px;
+    right: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: #374151;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: color 0.15s;
+    padding: 5px 12px;
+    border-radius: 99px;
+    transition: color 0.15s, background 0.15s;
 
     &:hover {
       color: #9ca3af;
+      background: rgba(255,255,255,0.08);
     }
   }
 
-  // ── Icon area ──────────────────────────────────
+  // ── Icon area ──────────────────────────────────────────
   &__icon-wrap {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 24px;
-    border-radius: 22px;
+    width: 86px;
+    height: 86px;
+    margin: 0 auto 28px;
+    border-radius: 26px;
     background: var(--accent-bg, rgba(59,130,246,0.08));
-    border: 1px solid var(--accent-border, rgba(59,130,246,0.2));
-    animation: iconFloat 3.5s ease-in-out infinite;
+    border: 1.5px solid var(--accent-border, rgba(59,130,246,0.22));
+    animation: iconFloat 3.8s ease-in-out infinite;
     transition: background 0.4s ease, border-color 0.4s ease;
+
+    // Inner ring
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border-radius: 20px;
+      border: 1px solid var(--accent-border, rgba(59,130,246,0.1));
+      pointer-events: none;
+    }
   }
 
   &__icon-orb {
     position: absolute;
-    inset: -16px;
+    inset: -20px;
     border-radius: 50%;
-    background: var(--accent-glow, rgba(59,130,246,0.06));
-    animation: glowPulse 3s ease-in-out infinite;
+    background: radial-gradient(circle, var(--accent-glow, rgba(59,130,246,0.1)) 0%, transparent 70%);
+    animation: glowPulse 3.2s ease-in-out infinite;
     pointer-events: none;
   }
 
   &__icon {
     position: relative;
     z-index: 1;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     color: var(--accent-color, #60a5fa);
     transition: color 0.4s ease;
   }
 
-  // ── Text content ──────────────────────────────────
+  // ── Text content ────────────────────────────────────────
   &__content {
     text-align: center;
   }
 
   &__counter {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
     color: var(--accent-color, #60a5fa);
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     transition: color 0.4s ease;
+
+    // Decorative dots on both sides
+    &::before, &::after {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      background: var(--accent-color, #60a5fa);
+      opacity: 0.4;
+    }
   }
 
   &__title {
-    font-size: 22px;
+    font-size: 23px;
     font-weight: 700;
-    color: #f3f4f6;
+    color: #f1f5f9;
     margin: 0 0 12px;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     line-height: 1.2;
+
+    @media (max-width: 400px) {
+      font-size: 20px;
+    }
   }
 
   &__desc {
     font-size: 14px;
-    color: #9ca3af;
-    line-height: 1.65;
-    margin: 0 0 16px;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin: 0 0 18px;
+
+    @media (max-width: 400px) {
+      font-size: 13px;
+    }
   }
 
+  // Callout tip box — left accent border style
   &__tip {
+    position: relative;
     background: var(--accent-bg, rgba(59,130,246,0.06));
     border: 1px solid var(--accent-border, rgba(59,130,246,0.15));
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 13px;
-    color: #d1d5db;
-    line-height: 1.55;
+    border-left: 3px solid var(--accent-color, #60a5fa);
+    border-radius: 0 14px 14px 0;
+    padding: 13px 16px;
+    font-size: 12.5px;
+    color: #cbd5e1;
+    line-height: 1.6;
     text-align: left;
     transition: background 0.4s ease, border-color 0.4s ease;
   }
 
-  // ── Progress ──────────────────────────────────────
+  // ── Progress bar ────────────────────────────────────────
   &__progress-track {
     height: 3px;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 99px;
-    margin: 24px 0 20px;
+    margin: 26px 0 20px;
     overflow: hidden;
   }
 
@@ -187,22 +253,22 @@
     height: 100%;
     background: var(--accent-gradient, linear-gradient(90deg, #3b82f6, #8b5cf6));
     border-radius: 99px;
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
+    transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
     animation: progressGrow 0.4s ease both;
   }
 
-  // ── Dots ──────────────────────────────────────────
+  // ── Navigation dots ─────────────────────────────────────
   &__dots {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
   }
 
   &__dot {
     height: 6px;
     border-radius: 99px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
     border: none;
     cursor: pointer;
     transition: background 0.25s ease, width 0.25s ease;
@@ -210,12 +276,12 @@
 
     &--active {
       background: var(--accent-color, #60a5fa);
-      width: 24px;
+      width: 26px;
       animation: dotExpand 0.25s ease both;
     }
   }
 
-  // ── Buttons ───────────────────────────────────────
+  // ── Action buttons ───────────────────────────────────────
   &__actions {
     display: flex;
     gap: 10px;
@@ -224,27 +290,29 @@
   &__btn-back {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
-    padding: 11px 18px;
-    border-radius: 12px;
+    min-height: 48px;
+    padding: 12px 18px;
+    border-radius: 16px;
     font-size: 14px;
     font-weight: 500;
     color: #9ca3af;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.09);
     cursor: pointer;
-    transition: background 0.18s, color 0.18s;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
     white-space: nowrap;
 
     &:hover {
       background: rgba(255, 255, 255, 0.1);
-      color: #f3f4f6;
+      color: #f1f5f9;
+      border-color: rgba(255,255,255,0.15);
     }
 
-    svg {
-      width: 15px;
-      height: 15px;
-    }
+    &:active { transform: scale(0.97); }
+
+    svg { width: 15px; height: 15px; }
   }
 
   &__btn-next {
@@ -253,23 +321,27 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 12px 20px;
-    border-radius: 12px;
+    min-height: 48px;
+    padding: 13px 22px;
+    border-radius: 16px;
     font-size: 14px;
     font-weight: 600;
     color: #fff;
     background: var(--accent-gradient, linear-gradient(135deg, #3b82f6, #8b5cf6));
     border: none;
     cursor: pointer;
-    transition: opacity 0.18s, transform 0.15s;
-    box-shadow: 0 4px 20px var(--accent-glow, rgba(59,130,246,0.25));
+    transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+    box-shadow: 0 4px 20px var(--accent-glow, rgba(59,130,246,0.28));
+    letter-spacing: -0.01em;
 
-    &:hover { opacity: 0.92; transform: translateY(-1px); }
-    &:active { transform: translateY(0); }
-
-    svg {
-      width: 16px;
-      height: 16px;
+    &:hover {
+      opacity: 0.93;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px var(--accent-glow, rgba(59,130,246,0.36));
     }
+
+    &:active { transform: translateY(0) scale(0.98); }
+
+    svg { width: 16px; height: 16px; }
   }
 }
