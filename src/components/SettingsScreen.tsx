@@ -23,6 +23,9 @@ import {
   requestPermission,
   registerSW,
   fireNotification,
+  subscribeToWebPush,
+  savePushSubscription,
+  unsubscribeFromWebPush,
 } from "../services/pushNotificationService";
 
 // Category selector component with custom option
@@ -175,21 +178,26 @@ export function SettingsScreen({
       setPermissionStatus(permission);
       setRequestingPermission(false);
 
-      if (permission !== 'granted') {
-        // User denied — don't enable
-        return;
-      }
+      if (permission !== 'granted') return;
 
       await registerSW();
+
+      // Subscribe to VAPID Web Push and save subscription to DB
+      const subscription = await subscribeToWebPush();
+      if (subscription) {
+        await savePushSubscription(subscription);
+      }
+
       setNotificationsEnabled(true);
       localStorage.setItem("sigmalog_notifications", "true");
 
-      // Fire a confirmation notification so user knows it works
       await fireNotification(
         'SigmaLog — Notifications ON ✅',
         `You'll be reminded at ${reminderTime} if you haven't logged.`
       );
     } else {
+      // Unsubscribe from VAPID push and clear DB record
+      await unsubscribeFromWebPush();
       setNotificationsEnabled(false);
       localStorage.setItem("sigmalog_notifications", "false");
     }
