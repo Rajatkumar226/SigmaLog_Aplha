@@ -157,6 +157,9 @@ export async function createHabits(
       };
     }
 
+    // Ensure public.users row exists (may not exist if handle_new_user trigger missed)
+    await db.from('users').upsert({ id: user.id, email: user.email }, { onConflict: 'id', ignoreDuplicates: true });
+
     const habitsToInsert = habits.map(habit => ({
       user_id: user.id,
       name: habit.name.trim(),
@@ -177,7 +180,6 @@ export async function createHabits(
           error: 'One or more habits with these names already exist',
         };
       }
-      // Foreign key violation - user doesn't exist in public.users
       if (error.code === '23503') {
         return {
           success: false,
