@@ -115,7 +115,7 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
   const habitPerformance = getHabitPerformance();
 
   return (
-    <div className="min-h-screen px-4 sm:px-6" style={{ paddingTop: 80, paddingBottom: 56 }}>
+    <div className="min-h-screen px-4 sm:px-6" style={{ paddingTop: 96, paddingBottom: 56 }}>
       <div className="max-w-7xl mx-auto">
         {/* Header — fixed, share button lives inside it */}
         <Header

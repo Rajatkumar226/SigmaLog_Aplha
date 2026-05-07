@@ -239,7 +239,7 @@ export function SettingsScreen({
   };
 
   return (
-    <div className="min-h-screen px-6" style={{ paddingTop: 80, paddingBottom: 56 }}>
+    <div className="min-h-screen px-6" style={{ paddingTop: 96, paddingBottom: 56 }}>
       <div className="max-w-3xl mx-auto">
         <Header onNavigate={onNavigate} currentScreen="settings" scrolled={scrolled} />
 

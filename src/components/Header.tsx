@@ -23,7 +23,7 @@ export function Header({
         position: 'fixed',
         top: 0, left: 0, right: 0,
         zIndex: 40,
-        height: 64,
+        height: 80,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

@@ -160,7 +160,7 @@ export function MainDashboard({
   };
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 relative overflow-hidden" style={{ paddingTop: 80, paddingBottom: 56 }}>
+    <div className="min-h-screen px-4 sm:px-6 relative overflow-hidden" style={{ paddingTop: 96, paddingBottom: 56 }}>
       {/* Ambient background orbs */}
       <div style={{
         position: 'fixed', top: '10%', left: '-8%',
