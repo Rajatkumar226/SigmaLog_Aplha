@@ -164,29 +164,45 @@ export function AuthScreen({ onAuthenticate: _onAuthenticate }: AuthScreenProps)
             )}
 
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              whileHover={{
+                scale: 1.03,
+                boxShadow: '0 8px 32px rgba(66,133,244,0.25)',
+              }}
+              whileTap={{ scale: 0.97 }}
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isProcessing}
-              style={{ color: '#111827' }}
-              className="w-full px-6 py-4 bg-white font-medium rounded-xl
+              style={{
+                color: '#111827',
+                borderRadius: '14px',
+                cursor: isProcessing ? 'not-allowed' : 'pointer',
+              }}
+              className="w-full px-6 py-4 bg-white font-medium
                 transition-all flex items-center justify-center gap-3
-                hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed
-                shadow-md hover:shadow-lg"
+                hover:bg-gray-50 disabled:opacity-50
+                shadow-md"
             >
               {isProcessing ? (
                 <>
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-5 h-5 border-2 border-gray-300 border-t-gray-700 rounded-full"
+                    className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full"
                   />
                   <span>Redirecting to Google...</span>
                 </>
               ) : (
                 <>
-                  <GoogleIcon />
+                  <motion.span
+                    whileHover={{ rotate: [0, -10, 10, 0] }}
+                    transition={{ duration: 0.4 }}
+                    style={{ display: 'flex' }}
+                  >
+                    <GoogleIcon />
+                  </motion.span>
                   <span>Continue with Google</span>
                 </>
               )}
