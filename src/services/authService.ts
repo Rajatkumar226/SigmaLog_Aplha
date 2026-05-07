@@ -90,6 +90,32 @@ export async function signIn(email: string, password: string): Promise<AuthRespo
 }
 
 /**
+ * Sign in with Google OAuth
+ */
+export async function signInWithGoogle(): Promise<AuthResponse> {
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    // Browser will redirect to Google — no session returned here
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to sign in with Google',
+    };
+  }
+}
+
+/**
  * Legacy: Send magic link (kept for compatibility)
  */
 export async function sendMagicLink(email: string): Promise<AuthResponse> {
