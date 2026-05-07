@@ -37,12 +37,26 @@ export function MainDashboard({
 }: MainDashboardProps) {
   const [displayScore, setDisplayScore] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(
+    // Auto-open share modal if app was launched from a share notification
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('share') === '1'
+  );
 
   const [todayExcuses, setTodayExcuses] = useState<Record<string, string>>({});
   const [showExcuseFor, setShowExcuseFor] = useState<string | null>(null);
   const [excuseInput, setExcuseInput] = useState('');
   const [submittingExcuse, setSubmittingExcuse] = useState(false);
+
+  // Open share modal when service worker sends NOTIFICATION_CLICK with share action
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type === 'NOTIFICATION_CLICK' && event.data?.action === 'share') {
+        setShowShareModal(true);
+      }
+    };
+    navigator.serviceWorker?.addEventListener('message', handler);
+    return () => navigator.serviceWorker?.removeEventListener('message', handler);
+  }, []);
 
   useEffect(() => {
     excuseService.getTodayExcuses().then(setTodayExcuses);

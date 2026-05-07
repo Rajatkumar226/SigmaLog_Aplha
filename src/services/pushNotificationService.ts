@@ -53,7 +53,11 @@ export async function registerSW(): Promise<ServiceWorkerRegistration | null> {
 
 // ── Direct notification (browser-based, Phase 1) ──────────────────────────────
 
-export async function fireNotification(title: string, body: string): Promise<void> {
+export async function fireNotification(
+  title: string,
+  body: string,
+  tag = 'sigmalog-reminder',
+): Promise<void> {
   if (getPermission() !== 'granted') return;
   try {
     const reg = await navigator.serviceWorker.ready;
@@ -62,8 +66,8 @@ export async function fireNotification(title: string, body: string): Promise<voi
       icon: '/icons/icon.svg',
       badge: '/icons/icon.svg',
       vibrate: [200, 100, 200],
-      tag: 'sigmalog-reminder',
-      renotify: false,
+      tag,
+      renotify: true,
     });
   } catch {
     new Notification(title, { body, icon: '/icons/icon.svg' });

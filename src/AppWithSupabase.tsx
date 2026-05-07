@@ -34,6 +34,11 @@ import {
   startReminderInterval,
   stopReminderInterval,
 } from './services/pushNotificationService';
+import {
+  notifyDailyComplete,
+  notifyStreakMilestone,
+  notifySharePrompt,
+} from './services/achievementNotificationService';
 import { useTimeCapsule } from './hooks/useTimeCapsule';
 import { toast } from 'sonner';
 
@@ -67,6 +72,9 @@ export default function App() {
 
   // Track if initial screen routing has been done
   const initialRoutingDoneRef = useRef(false);
+
+  // Track previous streak to detect new milestone crossings
+  const prevStreakRef = useRef(0);
 
   // Authentication
   const { isAuthenticated, loading: authLoading, user } = useAuth();
@@ -164,6 +172,44 @@ export default function App() {
 
     return () => stopReminderInterval();
   }, [isAuthenticated, habitsLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Daily completion notification ──────────────────────────────────────────
+  useEffect(() => {
+    if (!isAuthenticated || habitsLoading || habits.length === 0) return;
+    if (todayCompleted.length < habits.length) return;
+
+    const n = new Date();
+    const todayStr = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+    const key = `sigmalog_done_notified_${todayStr}`;
+    if (localStorage.getItem(key)) return;
+
+    localStorage.setItem(key, '1');
+    const currentHabits: Habit[] = habits.map(h => ({ id: h.id, name: h.name, category: h.category, points: h.points }));
+    notifyDailyComplete(currentHabits, streak);
+  }, [todayCompleted.length, habits.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Streak milestone notification ──────────────────────────────────────────
+  useEffect(() => {
+    if (!isAuthenticated || streak === 0) {
+      prevStreakRef.current = streak;
+      return;
+    }
+    const prev = prevStreakRef.current;
+    prevStreakRef.current = streak;
+    if (prev === streak) return;
+
+    const MILESTONES = [7, 14, 21, 30, 60, 90, 180, 365];
+    const crossed = MILESTONES.find(m => streak >= m && prev < m);
+    if (!crossed) return;
+
+    const key = `sigmalog_streak_notified_${crossed}`;
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, '1');
+
+    const currentHabits: Habit[] = habits.map(h => ({ id: h.id, name: h.name, category: h.category, points: h.points }));
+    notifyStreakMilestone(currentHabits, streak);
+    setTimeout(() => notifySharePrompt(streak), 8_000);
+  }, [streak]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Combine historical logs with today's data for UI components
   const dailyLogs: DailyLog[] = (() => {
