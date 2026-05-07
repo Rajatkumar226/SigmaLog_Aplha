@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrolled } from '../hooks/useScrolled';
 import { motion, AnimatePresence } from 'motion/react';
 import { Header } from './Header';
 import { StatsOverview } from './StatsOverview';
@@ -35,6 +36,7 @@ export function MainDashboard({
   onWriteCapsule,
   onOpenCapsule,
 }: MainDashboardProps) {
+  const scrolled = useScrolled();
   const [displayScore, setDisplayScore] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showShareModal, setShowShareModal] = useState(
@@ -158,7 +160,7 @@ export function MainDashboard({
   };
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden">
+    <div className="min-h-screen px-4 sm:px-6 relative overflow-hidden" style={{ paddingTop: 80, paddingBottom: 56 }}>
       {/* Ambient background orbs */}
       <div style={{
         position: 'fixed', top: '10%', left: '-8%',
@@ -194,6 +196,7 @@ export function MainDashboard({
           onCalendarClick={handleCalendarToggle}
           showCalendar={showCalendar}
           currentScreen="dashboard"
+          scrolled={scrolled}
         />
 
         <div className="mb-6 sm:mb-8">

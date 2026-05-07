@@ -460,9 +460,24 @@ export default function App() {
         />
       )}
 
-      {/* Alpha version footer */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 text-center pointer-events-none">
-        <p className="text-xs text-gray-700">
+      {/* Alpha version footer — fixed bottom bar */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 0, left: 0, right: 0,
+          zIndex: 30,
+          height: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(10,14,26,0.80)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          pointerEvents: 'none',
+        }}
+      >
+        <p style={{ fontSize: 11, color: '#4b5563', letterSpacing: '0.06em' }}>
           Alpha version — discipline in progress
         </p>
       </div>

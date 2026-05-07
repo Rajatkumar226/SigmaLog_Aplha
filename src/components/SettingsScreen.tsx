@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useScrolled } from "../hooks/useScrolled";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Plus,
@@ -109,6 +110,7 @@ export function SettingsScreen({
   onNavigate,
   onSignOut,
 }: SettingsScreenProps) {
+  const scrolled = useScrolled();
   const [localHabits, setLocalHabits] = useState<Habit[]>(habits);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
@@ -237,10 +239,9 @@ export function SettingsScreen({
   };
 
   return (
-    <div className="min-h-screen px-6 pt-12 pb-8">
+    <div className="min-h-screen px-6" style={{ paddingTop: 80, paddingBottom: 56 }}>
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <Header onNavigate={onNavigate} currentScreen="settings" />
+        <Header onNavigate={onNavigate} currentScreen="settings" scrolled={scrolled} />
 
         {/* Habit Editor */}
         <motion.div

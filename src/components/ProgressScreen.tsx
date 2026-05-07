@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useScrolled } from '../hooks/useScrolled';
 import { motion } from 'motion/react';
 import { TrendingUp, Award, Share2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
@@ -24,6 +25,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: ProgressScreenProps) {
+  const scrolled = useScrolled();
   const [weekExcuses, setWeekExcuses] = useState<excuseService.ExcuseRecord[]>([]);
   const [showShare, setShowShare] = useState(false);
 
@@ -113,11 +115,17 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
   const habitPerformance = getHabitPerformance();
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
+    <div className="min-h-screen px-4 sm:px-6" style={{ paddingTop: 80, paddingBottom: 56 }}>
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <Header onNavigate={onNavigate} currentScreen="progress" />
+        {/* Header — fixed, share button lives inside it */}
+        <Header
+          onNavigate={onNavigate}
+          currentScreen="progress"
+          scrolled={scrolled}
+          onShareClick={() => setShowShare(true)}
+        />
+        {/* legacy share button kept visually hidden; header now handles it */}
+        <div style={{ display: 'none' }}>
           <button
             onClick={() => setShowShare(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-500/15
