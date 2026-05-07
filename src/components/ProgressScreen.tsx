@@ -213,12 +213,14 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#1a1f35',
-                        border: '1px solid #ffffff20',
+                        border: '1px solid rgba(255,255,255,0.12)',
                         borderRadius: '8px',
+                        color: '#ffffff',
                       }}
-                      labelStyle={{ color: '#fff' }}
+                      labelStyle={{ color: '#ffffff' }}
+                      itemStyle={{ color: '#e2e8f0' }}
                     />
-                    <Bar 
+                    <Bar
                       dataKey="score" 
                       fill="#10b981"
                       radius={[4, 4, 0, 0]}
@@ -259,10 +261,12 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#1a1f35',
-                        border: '1px solid #ffffff20',
+                        border: '1px solid rgba(255,255,255,0.12)',
                         borderRadius: '8px',
+                        color: '#ffffff',
                       }}
-                      labelStyle={{ color: '#fff' }}
+                      labelStyle={{ color: '#ffffff' }}
+                      itemStyle={{ color: '#e2e8f0' }}
                       formatter={(value: number) => [`${value}%`, 'Completion']}
                     />
                     <Line 
@@ -315,9 +319,12 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
                       <Tooltip
                         contentStyle={{
                           backgroundColor: '#1a1f35',
-                          border: '1px solid #ffffff20',
+                          border: '1px solid rgba(255,255,255,0.12)',
                           borderRadius: '8px',
+                          color: '#ffffff',
                         }}
+                        itemStyle={{ color: '#e2e8f0' }}
+                        labelStyle={{ color: '#ffffff' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
