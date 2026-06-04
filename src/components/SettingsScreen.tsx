@@ -12,8 +12,10 @@ import {
   Download,
   Check,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Header } from "./Header";
 import { DataIntegrityIndicator } from "./DataIntegrityIndicator";
+import * as pushService from "../services/pushNotificationService";
 import type { Habit } from "../App";
 import { STANDARD_CATEGORIES } from "../App";
 
@@ -111,6 +113,7 @@ export function SettingsScreen({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showPwaInstructions, setShowPwaInstructions] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
 
   // Check if app is already installed
   useEffect(() => {
@@ -154,15 +157,47 @@ export function SettingsScreen({
     }
   };
 
-  // Save notification settings
-  const handleNotificationToggle = (enabled: boolean) => {
-    setNotificationsEnabled(enabled);
-    localStorage.setItem("sigmalog_notifications", enabled.toString());
+  // Enable/disable real web-push reminders
+  const handleNotificationToggle = async (enabled: boolean) => {
+    if (notifLoading) return;
+    setNotifLoading(true);
+
+    try {
+      if (enabled) {
+        const result = await pushService.enablePushNotifications(reminderTime);
+        if (result.ok) {
+          setNotificationsEnabled(true);
+          localStorage.setItem("sigmalog_notifications", "true");
+          toast.success("Reminders on — we'll nudge you morning and evening.");
+        } else {
+          const messages: Record<string, string> = {
+            unsupported: "This browser doesn't support push notifications.",
+            denied: "Notifications are blocked. Enable them in your browser settings.",
+            "no-vapid": "Push isn't configured yet. Please try again later.",
+            failed: "Couldn't enable reminders. Please try again.",
+          };
+          toast.error(messages[result.reason ?? "failed"]);
+          setNotificationsEnabled(false);
+          localStorage.setItem("sigmalog_notifications", "false");
+        }
+      } else {
+        await pushService.unsubscribeFromWebPush();
+        setNotificationsEnabled(false);
+        localStorage.setItem("sigmalog_notifications", "false");
+        toast.success("Reminders turned off.");
+      }
+    } finally {
+      setNotifLoading(false);
+    }
   };
 
   const handleReminderTimeChange = (time: string) => {
     setReminderTime(time);
     localStorage.setItem("sigmalog_reminder_time", time);
+    // Keep the server-side evening reminder time in sync when subscribed
+    if (notificationsEnabled) {
+      pushService.updateReminderTime(time);
+    }
   };
 
   const addHabit = () => {
@@ -305,7 +340,8 @@ export function SettingsScreen({
             </div>
             <button
               onClick={() => handleNotificationToggle(!notificationsEnabled)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              disabled={notifLoading}
+              className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                 notificationsEnabled ? "bg-green-500/30" : "bg-white/10"
               }`}
             >
