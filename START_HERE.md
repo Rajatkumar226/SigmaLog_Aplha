@@ -11,6 +11,12 @@
 5. Copy/paste `supabase/migrations/002_helper_functions.sql` → Click **"Run"**
 6. Click **"New Query"** again
 7. Copy/paste `supabase/migrations/003_counter_functions.sql` → Click **"Run"**
+8. Click **"New Query"** again
+9. Copy/paste `supabase/migrations/004_new_features.sql` → Click **"Run"**
+10. Click **"New Query"** again
+11. Copy/paste `supabase/migrations/005_push_subscriptions.sql` → Click **"Run"**
+12. Click **"New Query"** again
+13. Copy/paste `supabase/migrations/006_daily_push_notifications.sql` → Click **"Run"**
 
 ✅ Done? Continue to Step 2!
 
