@@ -105,16 +105,37 @@ export async function subscribeToWebPush(): Promise<PushSubscription | null> {
   }
 }
 
-export async function savePushSubscription(subscription: PushSubscription): Promise<void> {
+export async function savePushSubscription(
+  subscription: PushSubscription,
+  reminderTime?: string,
+): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
 
   await supabase
     .from('notifications')
     .upsert(
-      { user_id: user.id, push_subscription: subscription.toJSON(), enabled: true },
+      {
+        user_id: user.id,
+        push_subscription: subscription.toJSON(),
+        enabled: true,
+        // Persist the user's real timezone + reminder time so the Edge Function
+        // fires at their local time instead of the 20:00 UTC table default.
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        ...(reminderTime ? { reminder_time: reminderTime } : {}),
+      },
       { onConflict: 'user_id' },
     );
+}
+
+/** Update just the reminder time for the current user (when already subscribed). */
+export async function updateReminderTime(reminderTime: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from('notifications')
+    .update({ reminder_time: reminderTime })
+    .eq('user_id', user.id);
 }
 
 export async function unsubscribeFromWebPush(): Promise<void> {

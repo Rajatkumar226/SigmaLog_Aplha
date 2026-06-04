@@ -94,16 +94,19 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Check if user has already logged today
-      const { data: logs } = await supabase
-        .from("daily_logs")
-        .select("score")
-        .eq("user_id", row.user_id)
-        .eq("date", tzDate)
-        .gt("score", 0)
-        .limit(1);
+      // Skip if the day is already fully completed.
+      // daily_logs stores one row per (habit, day) keyed on log_date — there is
+      // no "date"/"score" column — so completion is derived via get_daily_score.
+      const { data: scoreRows } = await supabase.rpc("get_daily_score", {
+        p_user_id: row.user_id,
+        p_date: tzDate,
+      });
+      const s = Array.isArray(scoreRows) ? scoreRows[0] : scoreRows;
+      const maxScore = s?.max_score ?? 0;
+      const score = s?.score ?? 0;
 
-      if (logs && logs.length > 0) {
+      // Fully done for the day → no reminder needed
+      if (maxScore > 0 && score >= maxScore) {
         results.skipped++;
         continue;
       }

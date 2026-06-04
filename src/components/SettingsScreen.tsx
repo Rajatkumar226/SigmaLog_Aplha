@@ -24,6 +24,7 @@ import {
   fireNotification,
   subscribeToWebPush,
   savePushSubscription,
+  updateReminderTime,
   unsubscribeFromWebPush,
 } from "../services/pushNotificationService";
 
@@ -185,7 +186,7 @@ export function SettingsScreen({
       // Subscribe to VAPID Web Push and save subscription to DB
       const subscription = await subscribeToWebPush();
       if (subscription) {
-        await savePushSubscription(subscription);
+        await savePushSubscription(subscription, reminderTime);
       }
 
       setNotificationsEnabled(true);
@@ -206,6 +207,10 @@ export function SettingsScreen({
   const handleReminderTimeChange = (time: string) => {
     setReminderTime(time);
     localStorage.setItem("sigmalog_reminder_time", time);
+    // Keep the server-side reminder time in sync when already subscribed
+    if (notificationsEnabled) {
+      updateReminderTime(time);
+    }
   };
 
   const addHabit = () => {
