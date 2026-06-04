@@ -194,7 +194,7 @@ export function SettingsScreen({
 
       await fireNotification(
         'SigmaLog — Notifications ON ✅',
-        `You'll be reminded at ${reminderTime} if you haven't logged.`
+        `Morning nudge at 8:00 AM, plus an evening reminder at ${reminderTime} if you're not done.`
       );
     } else {
       // Unsubscribe from VAPID push and clear DB record
