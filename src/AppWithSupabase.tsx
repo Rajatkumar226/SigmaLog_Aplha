@@ -85,6 +85,7 @@ export default function App() {
     loading: habitsLoading,
     createHabits,
     updateHabit,
+    deleteHabit,
     permanentlyDeleteAllHabits,
     refetch: refetchHabits
   } = useHabits();
@@ -298,10 +299,60 @@ export default function App() {
   };
 
   const updateHabits = async (newHabits: Habit[]) => {
-    // This is a simplified update - in production you'd handle individual updates
-    // For now, we'll just refetch to ensure consistency
-    await refetchHabits();
-    toast.success('Habits updated successfully!');
+    try {
+      // Current habit IDs from the database
+      const currentHabitIds = habits.map(h => h.id);
+      const newHabitIds = newHabits.map(h => h.id);
+
+      // Habits removed in the editor (present in DB, absent from new list)
+      const habitsToDelete = habits.filter(h => !newHabitIds.includes(h.id));
+
+      // New habits get temporary local IDs prefixed with 'habit-'
+      const habitsToCreate = newHabits.filter(h => h.id.startsWith('habit-'));
+
+      // Existing habits that may have edits
+      const habitsToUpdate = newHabits.filter(h =>
+        currentHabitIds.includes(h.id) && !h.id.startsWith('habit-')
+      );
+
+      // Soft-delete removed habits (preserves historical logs)
+      for (const habit of habitsToDelete) {
+        await deleteHabit(habit.id);
+      }
+
+      // Create newly added habits
+      if (habitsToCreate.length > 0) {
+        const newHabitsData = habitsToCreate.map(h => ({
+          name: h.name,
+          category: h.category,
+          points: h.points,
+        }));
+        await createHabits(newHabitsData);
+      }
+
+      // Update existing habits only when something actually changed
+      for (const habit of habitsToUpdate) {
+        const originalHabit = habits.find(h => h.id === habit.id);
+        if (
+          originalHabit &&
+          (originalHabit.name !== habit.name ||
+            originalHabit.category !== habit.category ||
+            originalHabit.points !== habit.points)
+        ) {
+          await updateHabit(habit.id, {
+            name: habit.name,
+            category: habit.category,
+            points: habit.points,
+          });
+        }
+      }
+
+      // Refetch to reflect the authoritative database state
+      await refetchHabits();
+      toast.success('Habits updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update habits. Please try again.');
+    }
   };
 
   const resetData = async () => {
