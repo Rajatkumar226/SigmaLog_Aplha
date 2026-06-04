@@ -138,6 +138,42 @@ export async function updateReminderTime(reminderTime: string): Promise<void> {
     .eq('user_id', user.id);
 }
 
+/**
+ * Register the SW, request permission, subscribe, and save the subscription.
+ * Used both by per-task reminders and the Settings daily toggle. Idempotent.
+ */
+export async function ensureSubscribed(): Promise<{
+  ok: boolean;
+  reason?: 'unsupported' | 'denied' | 'no-vapid' | 'failed';
+}> {
+  if (!isNotificationSupported()) return { ok: false, reason: 'unsupported' };
+  await registerSW();
+  const permission = await requestPermission();
+  if (permission !== 'granted') return { ok: false, reason: 'denied' };
+  const subscription = await subscribeToWebPush();
+  if (!subscription) {
+    return { ok: false, reason: import.meta.env.VITE_VAPID_PUBLIC_KEY ? 'failed' : 'no-vapid' };
+  }
+  await savePushSubscription(subscription);
+  return { ok: true };
+}
+
+/** Settings toggle: enable/disable the morning new-day + evening + congrats pushes. */
+export async function setDailyRemindersEnabled(enabled: boolean): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from('notifications')
+    .upsert(
+      {
+        user_id: user.id,
+        daily_reminders_enabled: enabled,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      { onConflict: 'user_id' },
+    );
+}
+
 export async function unsubscribeFromWebPush(): Promise<void> {
   try {
     const reg = await navigator.serviceWorker.ready;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, HelpCircle } from 'lucide-react';
+import { Plus, Trash2, HelpCircle, Clock } from 'lucide-react';
 import type { Habit } from '../App';
 import { STANDARD_CATEGORIES } from '../App';
 
@@ -132,7 +132,7 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
           transition={{ delay: 0.1 }}
           className="text-gray-400 mb-8 text-sm"
         >
-          Add the habits you want to track daily. You can change these anytime in settings.
+          Add the habits you want to track daily. Set a time on any habit (⏰) to get a daily push reminding you to start it. You can change these anytime in settings.
         </motion.p>
 
         {/* Explanation cards */}
@@ -203,6 +203,24 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                       <option value={2}>2 pts</option>
                       <option value={3}>3 pts</option>
                     </select>
+
+                    <div
+                      className={`flex items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
+                        habit.reminderTime ? 'border-blue-400/40' : 'border-white/10'
+                      }`}
+                      title="Optional: daily reminder time for this task"
+                    >
+                      <Clock className={`w-3.5 h-3.5 flex-shrink-0 ${habit.reminderTime ? 'text-blue-400' : 'text-gray-500'}`} />
+                      <input
+                        type="time"
+                        value={habit.reminderTime ?? ''}
+                        onChange={(e) =>
+                          updateHabit(habit.id, { reminderTime: e.target.value || null })
+                        }
+                        aria-label="Reminder time"
+                        className="bg-transparent text-sm outline-none text-white w-[5.5rem] [color-scheme:dark]"
+                      />
+                    </div>
 
                     <button
                       type="button"

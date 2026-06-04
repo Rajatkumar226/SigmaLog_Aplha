@@ -165,6 +165,7 @@ export async function createHabits(
       name: habit.name.trim(),
       category: habit.category,
       points: habit.points,
+      reminder_time: habit.reminder_time ?? null,
     }));
 
     const { data, error } = await db
@@ -222,6 +223,9 @@ export async function updateHabit(
     }
     if (updates.points !== undefined) {
       updateData.points = updates.points;
+    }
+    if (updates.reminder_time !== undefined) {
+      updateData.reminder_time = updates.reminder_time;
     }
 
     const { data, error } = await db

@@ -19,6 +19,7 @@ export interface Habit {
   name: string;
   category: 'Body' | 'Mind' | 'Career' | 'Discipline' | string;
   points: 1 | 2 | 3;
+  reminderTime?: string | null; // 'HH:MM' local time for a daily per-task push; null/undefined = none
 }
 
 // Standard categories for selection
