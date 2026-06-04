@@ -33,6 +33,7 @@ import {
   checkAndNotify,
   startReminderInterval,
   stopReminderInterval,
+  ensureSubscribed,
 } from './services/pushNotificationService';
 import {
   notifyDailyComplete,
@@ -47,6 +48,7 @@ export interface Habit {
   name: string;
   category: 'Body' | 'Mind' | 'Career' | 'Discipline';
   points: 1 | 2 | 3;
+  reminderTime?: string | null; // 'HH:MM' local time for a daily per-task push; null/undefined = none
 }
 
 export interface DailyLog {
@@ -249,6 +251,18 @@ export default function App() {
     }
   };
 
+  // When a task has a reminder time, transparently turn on web push for it
+  // (asks permission once). This is separate from the Settings daily toggle.
+  const maybeEnableTaskPush = async (list: Habit[]) => {
+    if (!list.some(h => h.reminderTime)) return;
+    const res = await ensureSubscribed();
+    if (!res.ok && res.reason === 'denied') {
+      toast.error('Allow notifications to get your task reminders.');
+    } else if (!res.ok && res.reason === 'unsupported') {
+      toast.message('Task reminders need a browser that supports notifications.');
+    }
+  };
+
   const lockHabits = async (newHabits: Habit[]) => {
     // Prevent double submission
     if (isCreatingHabits) {
@@ -273,12 +287,15 @@ export default function App() {
         name: h.name,
         category: h.category,
         points: h.points,
+        reminder_time: h.reminderTime ?? null,
       }));
 
       // Try to create habits - this updates local state via setHabits in the hook
       const success = await createHabits(habitsToCreate);
 
       if (success) {
+        // If any task has a reminder time, make sure push is enabled for it
+        await maybeEnableTaskPush(newHabits);
         // Navigate to dashboard IMMEDIATELY after successful creation
         toast.success('Habits created! Let\'s start tracking.');
         localStorage.setItem('sigmalog_screen', 'dashboard');
@@ -326,6 +343,7 @@ export default function App() {
           name: h.name,
           category: h.category,
           points: h.points,
+          reminder_time: h.reminderTime ?? null,
         }));
         await createHabits(newHabitsData);
       }
@@ -337,15 +355,20 @@ export default function App() {
           originalHabit &&
           (originalHabit.name !== habit.name ||
             originalHabit.category !== habit.category ||
-            originalHabit.points !== habit.points)
+            originalHabit.points !== habit.points ||
+            (originalHabit.reminderTime ?? null) !== (habit.reminderTime ?? null))
         ) {
           await updateHabit(habit.id, {
             name: habit.name,
             category: habit.category,
             points: habit.points,
+            reminder_time: habit.reminderTime ?? null,
           });
         }
       }
+
+      // If any task now has a reminder time, ensure push is enabled
+      await maybeEnableTaskPush(newHabits);
 
       // Refetch to reflect the authoritative database state
       await refetchHabits();
@@ -417,6 +440,8 @@ export default function App() {
     name: h.name,
     category: h.category,
     points: h.points,
+    // Postgres TIME comes back as 'HH:MM:SS' — trim to 'HH:MM' for the <input type="time">
+    reminderTime: (h as any).reminder_time ? String((h as any).reminder_time).slice(0, 5) : null,
   }));
 
   return (

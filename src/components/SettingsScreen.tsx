@@ -12,6 +12,7 @@ import {
   Monitor,
   Download,
   Check,
+  Clock,
 } from "lucide-react";
 import { Header } from "./Header";
 import type { Habit } from "../App";
@@ -19,12 +20,9 @@ import { STANDARD_CATEGORIES } from "../App";
 import {
   isNotificationSupported,
   getPermission,
-  requestPermission,
-  registerSW,
   fireNotification,
-  subscribeToWebPush,
-  savePushSubscription,
-  updateReminderTime,
+  ensureSubscribed,
+  setDailyRemindersEnabled,
   unsubscribeFromWebPush,
 } from "../services/pushNotificationService";
 
@@ -170,46 +168,33 @@ export function SettingsScreen({
     }
   };
 
+  // Settings toggle controls the daily updates: morning new-day, evening
+  // tasks-left, and the all-done congrats. (Per-task reminders are enabled
+  // separately by setting a time on a task.)
   const handleNotificationToggle = async (enabled: boolean) => {
     if (enabled) {
       if (!isNotificationSupported()) return;
 
       setRequestingPermission(true);
-      const permission = await requestPermission();
-      setPermissionStatus(permission);
+      const res = await ensureSubscribed();
+      setPermissionStatus(getPermission());
       setRequestingPermission(false);
 
-      if (permission !== 'granted') return;
+      if (!res.ok) return;
 
-      await registerSW();
-
-      // Subscribe to VAPID Web Push and save subscription to DB
-      const subscription = await subscribeToWebPush();
-      if (subscription) {
-        await savePushSubscription(subscription, reminderTime);
-      }
-
+      await setDailyRemindersEnabled(true);
       setNotificationsEnabled(true);
       localStorage.setItem("sigmalog_notifications", "true");
 
       await fireNotification(
-        'SigmaLog — Notifications ON ✅',
-        `Morning nudge at 8:00 AM, plus an evening reminder at ${reminderTime} if you're not done.`
+        'SigmaLog — Daily updates ON ✅',
+        "We'll start your day and check in each evening on your habits.",
       );
     } else {
-      // Unsubscribe from VAPID push and clear DB record
-      await unsubscribeFromWebPush();
+      // Turn off daily updates, but keep the subscription for per-task reminders
+      await setDailyRemindersEnabled(false);
       setNotificationsEnabled(false);
       localStorage.setItem("sigmalog_notifications", "false");
-    }
-  };
-
-  const handleReminderTimeChange = (time: string) => {
-    setReminderTime(time);
-    localStorage.setItem("sigmalog_reminder_time", time);
-    // Keep the server-side reminder time in sync when already subscribed
-    if (notificationsEnabled) {
-      updateReminderTime(time);
     }
   };
 
@@ -299,6 +284,24 @@ export function SettingsScreen({
                         <option value={3}>3 pts</option>
                       </select>
 
+                      <div
+                        className={`flex items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
+                          habit.reminderTime ? "border-blue-400/40" : "border-white/10"
+                        }`}
+                        title="Optional: daily reminder time for this task (clear to stop it)"
+                      >
+                        <Clock className={`w-3.5 h-3.5 flex-shrink-0 ${habit.reminderTime ? "text-blue-400" : "text-gray-500"}`} />
+                        <input
+                          type="time"
+                          value={habit.reminderTime ?? ""}
+                          onChange={(e) =>
+                            updateHabit(habit.id, { reminderTime: e.target.value || null })
+                          }
+                          aria-label="Reminder time"
+                          className="bg-transparent text-sm outline-none text-white w-[5.5rem] [color-scheme:dark]"
+                        />
+                      </div>
+
                       <button
                         onClick={() => deleteHabit(habit.id)}
                         className="p-2 hover:bg-white/5 rounded transition-colors cursor-pointer"
@@ -374,63 +377,38 @@ export function SettingsScreen({
           )}
 
           {permissionStatus !== 'unsupported' && (
-            <>
-              {/* Enable Toggle */}
-              <div className="flex items-center justify-between py-4 px-4 bg-white/3 rounded-2xl mb-4">
-                <div>
-                  <p className="text-sm font-medium">Daily Reminder</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {notificationsEnabled && permissionStatus === 'granted'
-                      ? `Fires at ${reminderTime} if not logged`
-                      : "Tap to enable"}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleNotificationToggle(!notificationsEnabled)}
-                  disabled={requestingPermission || permissionStatus === 'denied'}
-                  className={`relative w-12 h-6 rounded-full transition-all duration-200 flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
-                    notificationsEnabled && permissionStatus === 'granted'
-                      ? "bg-green-500"
-                      : "bg-white/15"
-                  }`}
-                >
-                  {requestingPermission ? (
-                    <div className="absolute top-1 left-1 w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <motion.div
-                      animate={{ x: notificationsEnabled && permissionStatus === 'granted' ? 24 : 2 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      className="absolute top-1 left-0 w-4 h-4 rounded-full bg-white shadow-md"
-                    />
-                  )}
-                </button>
+            <div className="flex items-center justify-between gap-4 py-4 px-5 bg-white/[0.04] rounded-2xl">
+              <div className="min-w-0">
+                <p className="text-sm font-medium">Stay up to date with your tasks</p>
+                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                  A fresh-start nudge each morning, an evening reminder if anything's left,
+                  and a congrats when you finish the day. Per-task reminders are set on each
+                  habit above.
+                </p>
               </div>
-
-              {/* Time Selector */}
-              <AnimatePresence>
-                {notificationsEnabled && permissionStatus === 'granted' && (
+              <button
+                onClick={() => handleNotificationToggle(!notificationsEnabled)}
+                disabled={requestingPermission || permissionStatus === 'denied'}
+                role="switch"
+                aria-checked={notificationsEnabled && permissionStatus === 'granted'}
+                aria-label="Toggle daily updates"
+                className={`relative w-[52px] h-7 rounded-full transition-colors duration-300 flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
+                  notificationsEnabled && permissionStatus === 'granted'
+                    ? "bg-green-500 shadow-[0_0_0_4px_rgba(34,197,94,0.12)]"
+                    : "bg-white/15"
+                }`}
+              >
+                {requestingPermission ? (
+                  <div className="absolute top-1.5 left-1.5 w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-5 py-5 bg-white/3 rounded-2xl">
-                      <label className="block text-xs text-gray-400 uppercase tracking-widest mb-3">
-                        Remind me at
-                      </label>
-                      <input
-                        type="time"
-                        value={reminderTime}
-                        onChange={(e) => handleReminderTimeChange(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl
-                          outline-none focus:border-green-500/30 transition-colors text-sm"
-                      />
-                    </div>
-                  </motion.div>
+                    animate={{ x: notificationsEnabled && permissionStatus === 'granted' ? 27 : 3 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                    className="absolute top-[3px] left-0 w-[22px] h-[22px] rounded-full bg-white shadow-lg"
+                  />
                 )}
-              </AnimatePresence>
-            </>
+              </button>
+            </div>
           )}
         </motion.div>
 

@@ -57,6 +57,8 @@ export interface Database {
           name: string;
           category: string; // Allows custom categories
           points: 1 | 2 | 3;
+          reminder_time: string | null;
+          reminder_last_sent_date: string | null;
           created_at: string;
           updated_at: string;
           is_active: boolean;
@@ -67,6 +69,8 @@ export interface Database {
           name: string;
           category: string; // Allows custom categories
           points: 1 | 2 | 3;
+          reminder_time?: string | null;
+          reminder_last_sent_date?: string | null;
           created_at?: string;
           updated_at?: string;
           is_active?: boolean;
@@ -77,6 +81,8 @@ export interface Database {
           name?: string;
           category?: string; // Allows custom categories
           points?: 1 | 2 | 3;
+          reminder_time?: string | null;
+          reminder_last_sent_date?: string | null;
           created_at?: string;
           updated_at?: string;
           is_active?: boolean;
