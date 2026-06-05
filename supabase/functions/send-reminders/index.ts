@@ -36,13 +36,19 @@ const TASKS_LEFT = {
   title: "SigmaLog — Don't Let Today Go",
   body: "You still have habits unfinished. Open SigmaLog and close the loop.",
 };
+const CAPSULE_READY = {
+  title: "SigmaLog — Your Time Capsule is Ready 📬",
+  body: "A letter from your past self has arrived. Open SigmaLog to read it.",
+};
 
 const WINDOW_MIN = 2;          // ± minutes around a target time
 const NEW_DAY_MIN = 4 * 60;    // 04:00
 const DEFAULT_EVENING_MIN = 21 * 60; // 21:00 fallback for "tasks left"
 const CONGRATS_DELAY_MIN = 30; // fire congrats 30 min after last completion
+const CAPSULE_READY_MIN = 9 * 60; // don't fire the capsule push before 09:00 local
 
 type Habit = { id: string; user_id: string; name: string; reminder_time: string | null; reminder_last_sent_date: string | null };
+type Capsule = { id: string; user_id: string; deliver_on: string };
 
 function toMinutes(t: string): number {
   const [h, m] = String(t).split(":").map(Number);
@@ -96,8 +102,22 @@ Deno.serve(async (req) => {
     habitsByUser.set(h.user_id, list);
   }
 
+  // Un-opened, not-yet-notified time capsules, grouped by user
+  const { data: capsuleRows } = await supabase
+    .from("time_capsules")
+    .select("id, user_id, deliver_on")
+    .eq("is_opened", false)
+    .is("ready_notified_at", null);
+
+  const capsulesByUser = new Map<string, Capsule[]>();
+  for (const c of (capsuleRows ?? []) as Capsule[]) {
+    const list = capsulesByUser.get(c.user_id) ?? [];
+    list.push(c);
+    capsulesByUser.set(c.user_id, list);
+  }
+
   const now = new Date();
-  const results = { task: 0, newDay: 0, evening: 0, congrats: 0, skipped: 0, errors: 0 };
+  const results = { task: 0, capsule: 0, newDay: 0, evening: 0, congrats: 0, skipped: 0, errors: 0 };
 
   for (const u of users ?? []) {
     try {
@@ -117,6 +137,17 @@ Deno.serve(async (req) => {
         }));
         await supabase.from("habits").update({ reminder_last_sent_date: tzDate }).eq("id", h.id);
         results.task++;
+      }
+
+      // ── TIME CAPSULE ready (independent of daily toggle) ──────────────────
+      // Fire once per capsule on/after its delivery date, from 09:00 local.
+      if (currentMinutes >= CAPSULE_READY_MIN) {
+        for (const c of capsulesByUser.get(u.user_id) ?? []) {
+          if (c.deliver_on > tzDate) continue; // not delivered yet
+          await webPush.sendNotification(sub, JSON.stringify(CAPSULE_READY));
+          await supabase.from("time_capsules").update({ ready_notified_at: now.toISOString() }).eq("id", c.id);
+          results.capsule++;
+        }
       }
 
       if (!u.daily_reminders_enabled) { results.skipped++; continue; }
