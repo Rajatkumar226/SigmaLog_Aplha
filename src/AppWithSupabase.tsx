@@ -463,7 +463,7 @@ export default function App() {
           onToggleHabit={toggleHabit}
           dailyLogs={dailyLogs}
           onNavigate={setCurrentScreen}
-          capsuleStatus={!hasCapsule ? 'none' : readyCapsule ? 'ready' : 'pending'}
+          capsuleStatus={readyCapsule ? 'ready' : pendingCapsule ? 'pending' : 'none'}
           capsuleDaysLeft={
             pendingCapsule
               ? Math.max(0, Math.ceil(
