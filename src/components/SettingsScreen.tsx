@@ -251,24 +251,26 @@ export function SettingsScreen({
                   exit={{ opacity: 0, height: 0 }}
                   className="bg-white/5 border border-white/10 rounded-2xl p-4"
                 >
-                  <div className="flex flex-col md:flex-row lg:items-center gap-3 lg:gap-4">
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">
                     <input
                       type="text"
                       value={habit.name}
                       onChange={(e) =>
                         updateHabit(habit.id, { name: e.target.value })
                       }
-                      className="w-full lg:flex-1 bg-transparent border-none outline-none text-white"
+                      className="w-full lg:flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20 transition-colors"
                       placeholder="Habit name"
                     />
 
-                    <div className="flex items-center justify-between lg:justify-start gap-2">
-                      <CategorySelect
-                        value={habit.category}
-                        onChange={(value) =>
-                          updateHabit(habit.id, { category: value })
-                        }
-                      />
+                    <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
+                      <div className="flex-1 min-w-[130px] lg:flex-none lg:w-[150px]">
+                        <CategorySelect
+                          value={habit.category}
+                          onChange={(value) =>
+                            updateHabit(habit.id, { category: value })
+                          }
+                        />
+                      </div>
 
                       <select
                         value={habit.points}
@@ -277,7 +279,7 @@ export function SettingsScreen({
                             points: Number(e.target.value) as 1 | 2 | 3,
                           })
                         }
-                        className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm outline-none focus:border-white/20"
+                        className="flex-1 min-w-[72px] lg:flex-none bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm outline-none focus:border-white/20"
                       >
                         <option value={1}>1 pt</option>
                         <option value={2}>2 pts</option>
@@ -285,7 +287,7 @@ export function SettingsScreen({
                       </select>
 
                       <div
-                        className={`flex items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
+                        className={`flex flex-1 min-w-[116px] lg:flex-none lg:w-[124px] items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
                           habit.reminderTime ? "border-blue-400/40" : "border-white/10"
                         }`}
                         title="Optional: daily reminder time for this task (clear to stop it)"
@@ -298,13 +300,14 @@ export function SettingsScreen({
                             updateHabit(habit.id, { reminderTime: e.target.value || null })
                           }
                           aria-label="Reminder time"
-                          className="bg-transparent text-sm outline-none text-white w-[5.5rem] [color-scheme:dark]"
+                          className="flex-1 min-w-0 bg-transparent text-sm outline-none text-white [color-scheme:dark]"
                         />
                       </div>
 
                       <button
                         onClick={() => deleteHabit(habit.id)}
-                        className="p-2 hover:bg-white/5 rounded transition-colors cursor-pointer"
+                        aria-label="Delete habit"
+                        className="ml-auto lg:ml-0 p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer flex-shrink-0"
                       >
                         <Trash2 className="w-4 h-4 text-gray-400" />
                       </button>
@@ -315,10 +318,10 @@ export function SettingsScreen({
             </AnimatePresence>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={addHabit}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all cursor-pointer"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               Add Habit
@@ -326,7 +329,7 @@ export function SettingsScreen({
 
             <button
               onClick={saveChanges}
-              className="flex-1 px-6 py-2.5 bg-white text-black hover:bg-white/90 rounded-lg transition-all cursor-pointer"
+              className="w-full sm:flex-1 px-6 py-2.5 bg-white text-black hover:bg-white/90 rounded-lg transition-all cursor-pointer"
             >
               Save Changes
             </button>
@@ -541,17 +544,17 @@ export function SettingsScreen({
           ) : (
             <div className="flex items-center gap-3 flex-col">
               <AlertTriangle className="w-5 h-5 text-red-400" />
-              <span className="flex-1 text-sm">Are you sure?</span>
-              <div className="reset1 flex gap-4">
+              <span className="text-sm">Are you sure?</span>
+              <div className="reset1 flex gap-3 w-full">
                 <button
                   onClick={() => setShowResetConfirm(false)}
-                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all cursor-pointer"
+                  className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all cursor-pointer"
+                  className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all cursor-pointer"
                 >
                   Confirm Reset
                 </button>
