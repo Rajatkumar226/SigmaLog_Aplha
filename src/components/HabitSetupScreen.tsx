@@ -175,20 +175,22 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                 transition={{ duration: 0.3, delay: index * 0.08 }}
                 className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/[0.07] transition-colors"
               >
-                <div className="flex flex-col md:flex-row lg:items-center gap-3 lg:gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">
                   <input
                     type="text"
                     value={habit.name}
                     onChange={(e) => updateHabit(habit.id, { name: e.target.value })}
-                    className="flex-1 bg-transparent border-none outline-none text-white min-w-0"
+                    className="w-full lg:flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20 transition-colors min-w-0"
                     placeholder="Habit name"
                   />
 
-                  <div className="flex items-center justify-between lg:justify-start gap-2">
-                    <CategorySelect
-                      value={habit.category}
-                      onChange={(value) => updateHabit(habit.id, { category: value })}
-                    />
+                  <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
+                    <div className="flex-1 min-w-[130px] lg:flex-none lg:w-[150px]">
+                      <CategorySelect
+                        value={habit.category}
+                        onChange={(value) => updateHabit(habit.id, { category: value })}
+                      />
+                    </div>
 
                     <select
                       value={habit.points}
@@ -197,7 +199,7 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                       }
                       title="Points"
                       aria-label="Select points"
-                      className="w-full bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm outline-none focus:border-white/20 cursor-pointer"
+                      className="flex-1 min-w-[72px] lg:flex-none bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm outline-none focus:border-white/20 cursor-pointer"
                     >
                       <option value={1}>1 pt</option>
                       <option value={2}>2 pts</option>
@@ -205,7 +207,7 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                     </select>
 
                     <div
-                      className={`flex items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
+                      className={`flex flex-1 min-w-[116px] lg:flex-none lg:w-[124px] items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
                         habit.reminderTime ? 'border-blue-400/40' : 'border-white/10'
                       }`}
                       title="Optional: daily reminder time for this task"
@@ -218,7 +220,7 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                           updateHabit(habit.id, { reminderTime: e.target.value || null })
                         }
                         aria-label="Reminder time"
-                        className="bg-transparent text-sm outline-none text-white w-[5.5rem] [color-scheme:dark]"
+                        className="flex-1 min-w-0 bg-transparent text-sm outline-none text-white [color-scheme:dark]"
                       />
                     </div>
 
@@ -227,7 +229,7 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                       onClick={() => deleteHabit(habit.id)}
                       title="Delete habit"
                       aria-label="Delete habit"
-                      className="p-2 hover:bg-white/5 rounded transition-colors cursor-pointer flex-shrink-0"
+                      className="ml-auto lg:ml-0 p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4 text-gray-400" />
                     </button>
@@ -238,10 +240,10 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
           </AnimatePresence>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={addHabit}
-            className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add Habit
@@ -250,7 +252,7 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
           <button
             onClick={handleLock}
             disabled={habits.length === 0 || isLoading}
-            className="flex-1 px-6 py-3 bg-white text-black hover:bg-white/90 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full sm:flex-1 px-6 py-3 bg-white text-black hover:bg-white/90 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <span className="inline-flex items-center gap-2">
