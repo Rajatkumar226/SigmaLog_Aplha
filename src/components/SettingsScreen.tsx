@@ -12,7 +12,6 @@ import {
   Monitor,
   Download,
   Check,
-  Clock,
 } from "lucide-react";
 import { Header } from "./Header";
 import type { Habit } from "../App";
@@ -262,8 +261,9 @@ export function SettingsScreen({
                       placeholder="Habit name"
                     />
 
-                    <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
-                      <div className="flex-1 min-w-[130px] lg:flex-none lg:w-[150px]">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:gap-2">
+                      {/* Category — own full-width row on mobile so the label shows */}
+                      <div className="w-full sm:w-[150px] flex-shrink-0">
                         <CategorySelect
                           value={habit.category}
                           onChange={(value) =>
@@ -272,27 +272,22 @@ export function SettingsScreen({
                         />
                       </div>
 
-                      <select
-                        value={habit.points}
-                        onChange={(e) =>
-                          updateHabit(habit.id, {
-                            points: Number(e.target.value) as 1 | 2 | 3,
-                          })
-                        }
-                        className="flex-1 min-w-[72px] lg:flex-none bg-white/5 border border-white/10 rounded px-3 py-1.5 text-sm outline-none focus:border-white/20"
-                      >
-                        <option value={1}>1 pt</option>
-                        <option value={2}>2 pts</option>
-                        <option value={3}>3 pts</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={habit.points}
+                          onChange={(e) =>
+                            updateHabit(habit.id, {
+                              points: Number(e.target.value) as 1 | 2 | 3,
+                            })
+                          }
+                          aria-label="Points"
+                          className="flex-1 sm:flex-none sm:w-[78px] bg-white/5 border border-white/10 rounded-lg px-2.5 py-2 text-sm outline-none focus:border-white/20"
+                        >
+                          <option value={1}>1 pt</option>
+                          <option value={2}>2 pts</option>
+                          <option value={3}>3 pts</option>
+                        </select>
 
-                      <div
-                        className={`flex flex-1 min-w-[116px] lg:flex-none lg:w-[124px] items-center gap-1.5 bg-white/5 border rounded px-2 py-1.5 transition-colors ${
-                          habit.reminderTime ? "border-blue-400/40" : "border-white/10"
-                        }`}
-                        title="Optional: daily reminder time for this task (clear to stop it)"
-                      >
-                        <Clock className={`w-3.5 h-3.5 flex-shrink-0 ${habit.reminderTime ? "text-blue-400" : "text-gray-500"}`} />
                         <input
                           type="time"
                           value={habit.reminderTime ?? ""}
@@ -300,17 +295,20 @@ export function SettingsScreen({
                             updateHabit(habit.id, { reminderTime: e.target.value || null })
                           }
                           aria-label="Reminder time"
-                          className="flex-1 min-w-0 bg-transparent text-sm outline-none text-white [color-scheme:dark]"
+                          title="Optional: daily reminder time for this task (clear to stop it)"
+                          className={`flex-1 sm:flex-none sm:w-[128px] bg-white/5 border rounded-lg px-2.5 py-2 text-sm text-white outline-none [color-scheme:dark] transition-colors ${
+                            habit.reminderTime ? "border-blue-400/50" : "border-white/10"
+                          }`}
                         />
-                      </div>
 
-                      <button
-                        onClick={() => deleteHabit(habit.id)}
-                        aria-label="Delete habit"
-                        className="ml-auto lg:ml-0 p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer flex-shrink-0"
-                      >
-                        <Trash2 className="w-4 h-4 text-gray-400" />
-                      </button>
+                        <button
+                          onClick={() => deleteHabit(habit.id)}
+                          aria-label="Delete habit"
+                          className="flex-shrink-0 p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 text-gray-400" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
