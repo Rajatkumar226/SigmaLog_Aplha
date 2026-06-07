@@ -69,38 +69,41 @@ export function Header({
             <Share2 className="w-5 h-5" />
           </button>
         )}
-        <button
-          onClick={() => onNavigate('mirror')}
-          aria-label="The Mirror"
-          title="The Mirror — discipline insights"
-          className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
-            currentScreen === 'mirror'
-              ? 'bg-white/10 border-white/20'
-              : 'bg-white/5 hover:bg-white/10 border-white/10'
-          }`}
-        >
-          <Eye className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => onNavigate('progress')}
-          className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
-            currentScreen === 'progress'
-              ? 'bg-white/10 border-white/20'
-              : 'bg-white/5 hover:bg-white/10 border-white/10'
-          }`}
-        >
-          <BarChart3 className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => onNavigate('settings')}
-          className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
-            currentScreen === 'settings'
-              ? 'bg-white/10 border-white/20'
-              : 'bg-white/5 hover:bg-white/10 border-white/10'
-          }`}
-        >
-          <Settings className="w-5 h-5" />
-        </button>
+        {/* Destinations — hidden on mobile/tablet where the bottom tab bar owns them */}
+        <div className="hidden lg:flex gap-2">
+          <button
+            onClick={() => onNavigate('mirror')}
+            aria-label="The Mirror"
+            title="The Mirror — discipline insights"
+            className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
+              currentScreen === 'mirror'
+                ? 'bg-white/10 border-white/20'
+                : 'bg-white/5 hover:bg-white/10 border-white/10'
+            }`}
+          >
+            <Eye className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => onNavigate('progress')}
+            className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
+              currentScreen === 'progress'
+                ? 'bg-white/10 border-white/20'
+                : 'bg-white/5 hover:bg-white/10 border-white/10'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => onNavigate('settings')}
+            className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
+              currentScreen === 'settings'
+                ? 'bg-white/10 border-white/20'
+                : 'bg-white/5 hover:bg-white/10 border-white/10'
+            }`}
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </header>
   );

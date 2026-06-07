@@ -27,6 +27,7 @@ import { TimeCapsuleModal } from './components/TimeCapsuleModal';
 import { TimeCapsuleReveal } from './components/TimeCapsuleReveal';
 import { MirrorScreen } from './components/MirrorScreen';
 import { PactScreen } from './components/PactScreen';
+import { BottomNav } from './components/BottomNav';
 import { useAuth } from './hooks/useAuth';
 import { useHabits } from './hooks/useHabits';
 import { useDailyLogs } from './hooks/useDailyLogs';
@@ -544,14 +545,19 @@ export default function App() {
         />
       )}
 
-      {/* Alpha version footer — fixed bottom bar */}
+      {/* Mobile / tablet bottom tab bar */}
+      {['dashboard', 'progress', 'settings', 'mirror', 'pact'].includes(currentScreen) && (
+        <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />
+      )}
+
+      {/* Alpha version footer — fixed bottom bar (desktop only; bottom nav owns mobile) */}
       <div
+        className="hidden lg:flex"
         style={{
           position: 'fixed',
           bottom: 0, left: 0, right: 0,
           zIndex: 30,
           height: 40,
-          display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           background: 'rgba(10,14,26,0.80)',
