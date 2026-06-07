@@ -25,6 +25,13 @@ export interface PartnerRequest {
   createdAt: string;
 }
 
+export interface SentRequest {
+  id: string;
+  addresseeId: string;
+  email: string;
+  createdAt: string;
+}
+
 export async function sendRequestByEmail(email: string): Promise<{ ok: boolean; message: string }> {
   const { data, error } = await supabase.rpc('send_partner_request', { p_email: email });
   if (error) return { ok: false, message: error.message };
@@ -46,6 +53,23 @@ export async function listRequests(): Promise<PartnerRequest[]> {
 export async function respondToRequest(id: string, accept: boolean): Promise<boolean> {
   const { data, error } = await supabase.rpc('respond_partner_request', { p_id: id, p_accept: accept });
   return !error && !!data;
+}
+
+export async function listSentRequests(): Promise<SentRequest[]> {
+  const { data, error } = await supabase.rpc('list_sent_requests');
+  if (error || !data) return [];
+  return (data as any[]).map((r) => ({
+    id: r.id,
+    addresseeId: r.addressee_id,
+    email: r.email,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function cancelRequest(id: string): Promise<boolean> {
+  // RLS lets the requester delete their own pending row
+  const { error } = await supabase.from('accountability_partners').delete().eq('id', id);
+  return !error;
 }
 
 export async function getPartners(): Promise<PartnerStatus[]> {
