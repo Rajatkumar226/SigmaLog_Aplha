@@ -1,11 +1,11 @@
-import { Calendar, Share2, BarChart3, Settings } from 'lucide-react';
+import { Calendar, Share2, BarChart3, Settings, Eye } from 'lucide-react';
 
 interface HeaderProps {
-  onNavigate: (screen: 'dashboard' | 'progress' | 'settings') => void;
+  onNavigate: (screen: 'dashboard' | 'progress' | 'settings' | 'mirror') => void;
   onShareClick?: () => void;
   onCalendarClick?: () => void;
   showCalendar?: boolean;
-  currentScreen?: 'dashboard' | 'progress' | 'settings';
+  currentScreen?: 'dashboard' | 'progress' | 'settings' | 'mirror';
   scrolled?: boolean;
 }
 
@@ -69,6 +69,18 @@ export function Header({
             <Share2 className="w-5 h-5" />
           </button>
         )}
+        <button
+          onClick={() => onNavigate('mirror')}
+          aria-label="The Mirror"
+          title="The Mirror — discipline insights"
+          className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
+            currentScreen === 'mirror'
+              ? 'bg-white/10 border-white/20'
+              : 'bg-white/5 hover:bg-white/10 border-white/10'
+          }`}
+        >
+          <Eye className="w-5 h-5" />
+        </button>
         <button
           onClick={() => onNavigate('progress')}
           className={`p-2.5 border rounded-lg transition-all cursor-pointer ${
