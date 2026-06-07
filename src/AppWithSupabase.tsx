@@ -26,6 +26,7 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { TimeCapsuleModal } from './components/TimeCapsuleModal';
 import { TimeCapsuleReveal } from './components/TimeCapsuleReveal';
 import { MirrorScreen } from './components/MirrorScreen';
+import { PactScreen } from './components/PactScreen';
 import { useAuth } from './hooks/useAuth';
 import { useHabits } from './hooks/useHabits';
 import { useDailyLogs } from './hooks/useDailyLogs';
@@ -59,7 +60,7 @@ export interface DailyLog {
   maxScore: number;
 }
 
-type Screen = 'landing' | 'setup' | 'dashboard' | 'progress' | 'settings' | 'mirror';
+type Screen = 'landing' | 'setup' | 'dashboard' | 'progress' | 'settings' | 'mirror' | 'pact';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
@@ -486,6 +487,9 @@ export default function App() {
       )}
       {currentScreen === 'mirror' && (
         <MirrorScreen onNavigate={setCurrentScreen} />
+      )}
+      {currentScreen === 'pact' && (
+        <PactScreen onNavigate={setCurrentScreen} />
       )}
       {currentScreen === 'settings' && (
         <SettingsScreen

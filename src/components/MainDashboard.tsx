@@ -18,7 +18,7 @@ interface MainDashboardProps {
   todayCompleted: string[];
   onToggleHabit: (habitId: string) => void;
   dailyLogs: DailyLog[];
-  onNavigate: (screen: 'dashboard' | 'progress' | 'settings') => void;
+  onNavigate: (screen: 'dashboard' | 'progress' | 'settings' | 'mirror' | 'pact') => void;
   capsuleStatus: 'none' | 'pending' | 'ready';
   capsuleDaysLeft: number;
   onWriteCapsule: () => void;
@@ -455,6 +455,25 @@ export function MainDashboard({
                 onWrite={onWriteCapsule}
                 onOpen={onOpenCapsule}
               />
+            </motion.div>
+
+            {/* Accountability Pact Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.26 }}
+            >
+              <button
+                onClick={() => onNavigate('pact')}
+                className="w-full text-left bg-white/5 hover:bg-white/[0.08] border border-white/10 rounded-2xl p-5 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-lg">🤝</span>
+                  <span className="text-[11px] uppercase tracking-widest text-gray-500">Accountability</span>
+                </div>
+                <p className="text-sm font-medium mb-1">Find a partner. Hold the line.</p>
+                <p className="text-xs text-gray-500">Link with someone who sees if you show up — or don't.</p>
+              </button>
             </motion.div>
 
             {/* Monthly Calendar */}
