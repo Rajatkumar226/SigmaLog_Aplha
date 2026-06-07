@@ -12,7 +12,7 @@ interface PactScreenProps {
 
 export function PactScreen({ onNavigate }: PactScreenProps) {
   const scrolled = useScrolled();
-  const { partners, requests, loading, sendRequest, respond, remove } = usePartners();
+  const { partners, requests, sent, loading, sendRequest, respond, remove, cancel } = usePartners();
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -76,6 +76,36 @@ export function PactScreen({ onNavigate }: PactScreenProps) {
             </button>
           </div>
         </motion.div>
+
+        {/* Sent (outgoing pending) requests */}
+        <AnimatePresence>
+          {sent.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6 overflow-hidden"
+            >
+              <h3 className="text-sm text-gray-400 mb-2 uppercase tracking-widest text-[11px]">Sent — waiting to accept</h3>
+              <div className="space-y-2">
+                {sent.map((s) => (
+                  <div key={s.id} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+                    <div className="min-w-0 mr-3">
+                      <p className="text-sm truncate">{s.email}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Pending — waiting for them to accept</p>
+                    </div>
+                    <button
+                      onClick={async () => { if (await cancel(s.id)) toast.success('Request cancelled'); }}
+                      className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg transition-colors cursor-pointer flex-shrink-0"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Incoming requests */}
         <AnimatePresence>

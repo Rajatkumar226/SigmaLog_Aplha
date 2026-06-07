@@ -4,17 +4,20 @@ import * as partnerService from '../services/partnerService';
 export function usePartners() {
   const [partners, setPartners] = useState<partnerService.PartnerStatus[]>([]);
   const [requests, setRequests] = useState<partnerService.PartnerRequest[]>([]);
+  const [sent, setSent] = useState<partnerService.SentRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refetch = useCallback(async () => {
     setLoading(true);
     try {
-      const [p, r] = await Promise.all([
+      const [p, r, s] = await Promise.all([
         partnerService.getPartners(),
         partnerService.listRequests(),
+        partnerService.listSentRequests(),
       ]);
       setPartners(p);
       setRequests(r);
+      setSent(s);
     } finally {
       setLoading(false);
     }
@@ -42,5 +45,11 @@ export function usePartners() {
     return ok;
   };
 
-  return { partners, requests, loading, refetch, sendRequest, respond, remove };
+  const cancel = async (id: string) => {
+    const ok = await partnerService.cancelRequest(id);
+    if (ok) await refetch();
+    return ok;
+  };
+
+  return { partners, requests, sent, loading, refetch, sendRequest, respond, remove, cancel };
 }
