@@ -114,6 +114,19 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
   const categoryData = getCategoryDistribution();
   const habitPerformance = getHabitPerformance();
 
+  // Summary stats — only count real activity. dailyLogs includes every
+  // calendar day in the window (even empty ones with score 0 / maxScore 0),
+  // so we must filter, or empty days would inflate every number.
+  const daysWithHabits = dailyLogs.filter(log => log.maxScore > 0);
+  const totalDaysLogged = dailyLogs.filter(log => log.score > 0).length;
+  const perfectDaysCount = daysWithHabits.filter(log => log.score === log.maxScore).length;
+  const avgCompletion = daysWithHabits.length > 0
+    ? Math.round(
+        daysWithHabits.reduce((sum, log) => sum + (log.score / log.maxScore) * 100, 0) /
+          daysWithHabits.length,
+      )
+    : 0;
+
   return (
     <div className="min-h-screen px-4 sm:px-6" style={{ paddingTop: 96, paddingBottom: 56 }}>
       <div className="max-w-7xl mx-auto">
@@ -145,7 +158,7 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
             className="bg-white/5 border border-white/10 rounded-lg p-4 sm:p-6"
           >
             <p className="text-sm text-gray-400 mb-2">Total Days Logged</p>
-            <p className="text-3xl">{dailyLogs.length}</p>
+            <p className="text-3xl">{totalDaysLogged}</p>
           </motion.div>
           
           <motion.div
@@ -156,7 +169,7 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
           >
             <p className="text-sm text-gray-400 mb-2">Perfect Days</p>
             <div className="flex items-baseline gap-2">
-              <p className="text-3xl">{dailyLogs.filter(log => log.score === log.maxScore).length}</p>
+              <p className="text-3xl">{perfectDaysCount}</p>
               <Award className="w-5 h-5 text-green-400" />
             </div>
           </motion.div>
@@ -179,11 +192,7 @@ export function ProgressScreen({ habits, dailyLogs, streak, onNavigate }: Progre
           >
             <p className="text-sm text-gray-400 mb-2">Avg Completion</p>
             <div className="flex items-baseline gap-2">
-              <p className="text-3xl">
-                {dailyLogs.length > 0 
-                  ? Math.round(dailyLogs.reduce((sum, log) => sum + (log.score / log.maxScore) * 100, 0) / dailyLogs.length)
-                  : 0}%
-              </p>
+              <p className="text-3xl">{avgCompletion}%</p>
               <TrendingUp className="w-5 h-5 text-blue-400" />
             </div>
           </motion.div>

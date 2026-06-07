@@ -103,11 +103,15 @@ function StatTooltip({
 }
 
 export function StatsOverview({ dailyLogs, currentScore, maxScore, streak }: StatsOverviewProps) {
-  const totalDays = dailyLogs.length;
-  const perfectDays = dailyLogs.filter(log => log.score === log.maxScore).length;
+  // Only count days that actually had habits — dailyLogs includes empty
+  // calendar days (score 0 / maxScore 0) which would otherwise read as
+  // "perfect" (0 === 0) and divide-by-zero into NaN.
+  const daysWithHabits = dailyLogs.filter(log => log.maxScore > 0);
+  const totalDays = daysWithHabits.length;
+  const perfectDays = daysWithHabits.filter(log => log.score === log.maxScore).length;
   const completionRate = totalDays > 0 ? Math.round((perfectDays / totalDays) * 100) : 0;
 
-  const last7Days = dailyLogs.slice(-7);
+  const last7Days = daysWithHabits.slice(-7);
   const weeklyAvg = last7Days.length > 0
     ? Math.round(last7Days.reduce((sum, log) => sum + (log.score / log.maxScore) * 100, 0) / last7Days.length)
     : 0;
