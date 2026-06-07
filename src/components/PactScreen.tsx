@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { UserPlus, Check, X, Trash2, Flame } from 'lucide-react';
+import { UserPlus, Check, X, Trash2, Flame, Link as LinkIcon } from 'lucide-react';
 import { Header } from './Header';
 import { useScrolled } from '../hooks/useScrolled';
 import { usePartners } from '../hooks/usePartners';
+import * as partnerService from '../services/partnerService';
 import { toast } from 'sonner';
 
 interface PactScreenProps {
@@ -26,6 +27,30 @@ export function PactScreen({ onNavigate }: PactScreenProps) {
       setEmail('');
     } else {
       toast.error(res.message);
+    }
+  };
+
+  const handleShareLink = async () => {
+    const code = await partnerService.getMyInviteCode();
+    if (!code) {
+      toast.error('Could not create an invite link. Try again.');
+      return;
+    }
+    const url = `${window.location.origin}/?invite=${code}`;
+    const text = `I'm building discipline on SigmaLog 🗿 — be my accountability partner: ${url}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'SigmaLog', text });
+      } catch {
+        /* user cancelled share sheet */
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Invite link copied — paste it to a friend.');
+      } catch {
+        toast.message(url);
+      }
     }
   };
 
@@ -75,6 +100,23 @@ export function PactScreen({ onNavigate }: PactScreenProps) {
               {sending ? 'Sending...' : 'Send Request'}
             </button>
           </div>
+
+          {/* Share invite link — works even if they don't have an account yet */}
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-[11px] uppercase tracking-widest text-gray-600">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+          <button
+            onClick={handleShareLink}
+            className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-all cursor-pointer"
+          >
+            <LinkIcon className="w-4 h-4" />
+            Share an invite link
+          </button>
+          <p className="text-[11px] text-gray-600 mt-2 text-center">
+            Send it to anyone — they don't need an account yet. They join, you're partners.
+          </p>
         </motion.div>
 
         {/* Sent (outgoing pending) requests */}
