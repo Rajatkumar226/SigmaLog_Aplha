@@ -11,7 +11,10 @@ export function ShadowStats({ dailyLogs, habits }: ShadowStatsProps) {
   if (dailyLogs.length === 0 || habits.length === 0) return null;
 
   const today = new Date().toISOString().split('T')[0];
-  const firstLogDate = [...dailyLogs].map(l => l.date).sort()[0];
+  // Base "days since start" on the first day with real activity, not the
+  // earliest empty calendar day in the window (which over-counts).
+  const activeDates = dailyLogs.filter(l => l.score > 0).map(l => l.date).sort();
+  const firstLogDate = activeDates[0] ?? today;
 
   const start = new Date(firstLogDate);
   const end = new Date(today);
