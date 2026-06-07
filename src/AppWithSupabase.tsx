@@ -28,6 +28,8 @@ import { TimeCapsuleReveal } from './components/TimeCapsuleReveal';
 import { MirrorScreen } from './components/MirrorScreen';
 import { PactScreen } from './components/PactScreen';
 import { BottomNav } from './components/BottomNav';
+import { InvitePrompt } from './components/InvitePrompt';
+import * as partnerService from './services/partnerService';
 import { useAuth } from './hooks/useAuth';
 import { useHabits } from './hooks/useHabits';
 import { useDailyLogs } from './hooks/useDailyLogs';
@@ -71,6 +73,7 @@ export default function App() {
   const [showAuthScreen, setShowAuthScreen] = useState(false);
   const [showCapsuleWrite, setShowCapsuleWrite] = useState(false);
   const [showCapsuleReveal, setShowCapsuleReveal] = useState(false);
+  const [invitePrompt, setInvitePrompt] = useState<{ code: string; email: string } | null>(null);
 
   // Track if this is initial load vs a refetch
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -120,6 +123,47 @@ export default function App() {
       setShowCapsuleReveal(true);
     }
   }, [readyCapsule, isAuthenticated, currentScreen]);
+
+  // Accountability invite links (?invite=code). Remember the code if the
+  // visitor isn't logged in yet; once authenticated, prompt to accept.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const urlCode = url.searchParams.get('invite');
+    if (urlCode) {
+      localStorage.setItem('sigmalog_pending_invite', urlCode);
+      url.searchParams.delete('invite');
+      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+    }
+    const code = localStorage.getItem('sigmalog_pending_invite');
+    if (!code || !isAuthenticated) return;
+    (async () => {
+      const info = await partnerService.lookupInvite(code);
+      if (info.status === 'ok' && info.email) {
+        setInvitePrompt({ code, email: info.email });
+      } else {
+        localStorage.removeItem('sigmalog_pending_invite');
+        if (info.status === 'connected') toast.message("You're already connected with them.");
+      }
+    })();
+  }, [isAuthenticated]);
+
+  const handleAcceptInvite = async () => {
+    if (!invitePrompt) return;
+    const res = await partnerService.acceptInviteCode(invitePrompt.code);
+    localStorage.removeItem('sigmalog_pending_invite');
+    setInvitePrompt(null);
+    if (res.ok) {
+      toast.success(res.message);
+      setCurrentScreen('pact');
+    } else {
+      toast.error(res.message);
+    }
+  };
+
+  const handleDismissInvite = () => {
+    localStorage.removeItem('sigmalog_pending_invite');
+    setInvitePrompt(null);
+  };
 
   // Load screen state from localStorage (screen navigation persistence)
   // Only runs ONCE on initial load after authentication and habits are loaded
@@ -548,6 +592,15 @@ export default function App() {
       {/* Mobile / tablet bottom tab bar */}
       {['dashboard', 'progress', 'settings', 'mirror', 'pact'].includes(currentScreen) && (
         <BottomNav currentScreen={currentScreen} onNavigate={setCurrentScreen} />
+      )}
+
+      {/* Accountability invite prompt (from a shared link) */}
+      {invitePrompt && (
+        <InvitePrompt
+          email={invitePrompt.email}
+          onAccept={handleAcceptInvite}
+          onDismiss={handleDismissInvite}
+        />
       )}
 
       {/* Alpha version footer — fixed bottom bar (desktop only; bottom nav owns mobile) */}

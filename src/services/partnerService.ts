@@ -66,6 +66,28 @@ export async function listSentRequests(): Promise<SentRequest[]> {
   }));
 }
 
+// ── Invite links ────────────────────────────────────────────────────────────
+
+export async function getMyInviteCode(): Promise<string | null> {
+  const { data, error } = await supabase.rpc('get_my_invite_code');
+  if (error || !data) return null;
+  return data as string;
+}
+
+export async function lookupInvite(code: string): Promise<{ status: string; email: string | null }> {
+  const { data, error } = await supabase.rpc('lookup_invite', { p_code: code });
+  if (error || !data) return { status: 'invalid', email: null };
+  const row = Array.isArray(data) ? data[0] : data;
+  return { status: row?.status ?? 'invalid', email: row?.inviter_email ?? null };
+}
+
+export async function acceptInviteCode(code: string): Promise<{ ok: boolean; message: string }> {
+  const { data, error } = await supabase.rpc('accept_invite_code', { p_code: code });
+  if (error) return { ok: false, message: error.message };
+  const row = Array.isArray(data) ? data[0] : data;
+  return { ok: !!row?.ok, message: row?.message ?? 'Something went wrong' };
+}
+
 export async function cancelRequest(id: string): Promise<boolean> {
   // RLS lets the requester delete their own pending row
   const { error } = await supabase.from('accountability_partners').delete().eq('id', id);
