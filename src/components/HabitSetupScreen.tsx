@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, HelpCircle } from 'lucide-react';
+import { Plus, Trash2, HelpCircle, Clock } from 'lucide-react';
 import type { Habit } from '../App';
 import { STANDARD_CATEGORIES } from '../App';
 
@@ -208,18 +208,23 @@ export function HabitSetupScreen({ onLockHabits, existingHabits, isLoading = fal
                         <option value={3}>3 pts</option>
                       </select>
 
-                      <input
-                        type="time"
-                        value={habit.reminderTime ?? ''}
-                        onChange={(e) =>
-                          updateHabit(habit.id, { reminderTime: e.target.value || null })
-                        }
-                        aria-label="Reminder time"
-                        title="Optional: daily reminder time for this task"
-                        className={`flex-1 sm:flex-none sm:w-[128px] bg-white/5 border rounded-lg px-2.5 py-2 text-sm text-white outline-none [color-scheme:dark] transition-colors ${
+                      <div
+                        className={`flex flex-1 sm:flex-none sm:w-[136px] items-center gap-1.5 bg-white/5 border rounded-lg px-2.5 py-2 transition-colors ${
                           habit.reminderTime ? 'border-blue-400/50' : 'border-white/10'
                         }`}
-                      />
+                        title="Optional: daily reminder time for this task"
+                      >
+                        <Clock className={`w-4 h-4 flex-shrink-0 ${habit.reminderTime ? 'text-blue-400' : 'text-gray-400'}`} />
+                        <input
+                          type="time"
+                          value={habit.reminderTime ?? ''}
+                          onChange={(e) =>
+                            updateHabit(habit.id, { reminderTime: e.target.value || null })
+                          }
+                          aria-label="Reminder time"
+                          className="flex-1 min-w-0 bg-transparent text-sm text-white outline-none [color-scheme:dark]"
+                        />
+                      </div>
 
                       <button
                         type="button"

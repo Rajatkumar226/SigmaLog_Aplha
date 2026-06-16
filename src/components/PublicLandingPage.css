@@ -488,6 +488,16 @@
   margin-bottom: 4rem;
 }
 
+/* Tighten the big vertical gaps between same-colored sections on phones */
+@media (max-width: 640px) {
+  .landing-section {
+    padding: 2.75rem 1.25rem;
+  }
+  .landing-section-header {
+    margin-bottom: 2.25rem;
+  }
+}
+
 .landing-section-title {
   font-size: 1.875rem;
   font-weight: 700;
