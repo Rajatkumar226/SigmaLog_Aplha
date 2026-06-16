@@ -10,7 +10,7 @@
    card on each screen) isn't tucked under it. Desktop has no bottom bar. */
 @media (max-width: 1023px) {
   body {
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(25px + env(safe-area-inset-bottom, 0px));
   }
 }
 
