@@ -20,6 +20,9 @@
   }
 
   body {
+    /* Match the app's dark canvas so the bottom-nav padding area and any
+       overscroll don't flash the browser-default white. */
+    background-color: #0a0e1a;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
       "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
       "Helvetica Neue", sans-serif;
