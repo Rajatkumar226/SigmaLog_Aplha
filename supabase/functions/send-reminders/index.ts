@@ -150,14 +150,14 @@ Deno.serve(async (req) => {
         }
       }
 
-      if (!u.daily_reminders_enabled) { results.skipped++; continue; }
+      if (!u.daily_reminders_enabled) { results.skipped++; return; }
 
       // ── 04:00 NEW DAY ─────────────────────────────────────────────────────
       if (near(currentMinutes, NEW_DAY_MIN) && !sentOnLocalDay(u.morning_sent_at, tz, tzDate)) {
         await webPush.sendNotification(sub, JSON.stringify(NEW_DAY));
         await supabase.from("notifications").update({ morning_sent_at: now.toISOString() }).eq("user_id", u.user_id);
         results.newDay++;
-        continue;
+        return;
       }
 
       // ── Completion-driven evening logic ───────────────────────────────────
@@ -165,11 +165,11 @@ Deno.serve(async (req) => {
       const s = Array.isArray(scoreRows) ? scoreRows[0] : scoreRows;
       const maxScore = s?.max_score ?? 0;
       const score = s?.score ?? 0;
-      if (maxScore === 0) { results.skipped++; continue; }
+      if (maxScore === 0) { results.skipped++; return; }
 
       if (score >= maxScore) {
         // CONGRATS — 30 min after the last completion
-        if (sentOnLocalDay(u.congrats_sent_at, tz, tzDate)) { results.skipped++; continue; }
+        if (sentOnLocalDay(u.congrats_sent_at, tz, tzDate)) { results.skipped++; return; }
         const { data: lastLog } = await supabase
           .from("daily_logs")
           .select("completed_at")
@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
           .order("completed_at", { ascending: false })
           .limit(1);
         const lastAt = lastLog?.[0]?.completed_at ? new Date(lastLog[0].completed_at) : null;
-        if (!lastAt || (now.getTime() - lastAt.getTime()) < CONGRATS_DELAY_MIN * 60_000) { results.skipped++; continue; }
+        if (!lastAt || (now.getTime() - lastAt.getTime()) < CONGRATS_DELAY_MIN * 60_000) { results.skipped++; return; }
 
         const { data: streak } = await supabase.rpc("calculate_streak", { p_user_id: u.user_id });
         const n = typeof streak === "number" ? streak : 0;
@@ -190,10 +190,10 @@ Deno.serve(async (req) => {
         results.congrats++;
       } else {
         // TASKS LEFT — at (latest habit reminder_time + 1h), else 21:00
-        if (sentOnLocalDay(u.evening_sent_at, tz, tzDate)) { results.skipped++; continue; }
+        if (sentOnLocalDay(u.evening_sent_at, tz, tzDate)) { results.skipped++; return; }
         const times = myHabits.map((h) => toMinutes(h.reminder_time!)).filter((n) => !isNaN(n));
         const nudgeMin = times.length ? Math.min(Math.max(...times) + 60, 23 * 60 + 59) : DEFAULT_EVENING_MIN;
-        if (!near(currentMinutes, nudgeMin)) { results.skipped++; continue; }
+        if (!near(currentMinutes, nudgeMin)) { results.skipped++; return; }
         await webPush.sendNotification(sub, JSON.stringify(TASKS_LEFT));
         await supabase.from("notifications").update({ evening_sent_at: now.toISOString() }).eq("user_id", u.user_id);
         results.evening++;
