@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
   const now = new Date();
   const results = { task: 0, capsule: 0, newDay: 0, evening: 0, congrats: 0, skipped: 0, errors: 0 };
 
-  for (const u of users ?? []) {
+  const processUser = async (u: any) => {
     try {
       const tz = u.timezone || "UTC";
       const { tzDate, currentMinutes } = localParts(now, tz);
@@ -202,6 +202,15 @@ Deno.serve(async (req) => {
       results.errors++;
       console.error(`Push failed for user ${u.user_id}:`, err);
     }
+  };
+
+  // Process users in bounded-concurrency batches so a burst (e.g. everyone's
+  // 04:00 "new day" push landing in the same minute) runs in parallel and
+  // can't pile up sequentially and exceed the function time limit.
+  const BATCH = 25;
+  const list = users ?? [];
+  for (let i = 0; i < list.length; i += BATCH) {
+    await Promise.allSettled(list.slice(i, i + BATCH).map(processUser));
   }
 
   return new Response(JSON.stringify(results), { headers: { "Content-Type": "application/json" } });
